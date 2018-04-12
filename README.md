@@ -3,3 +3,6 @@ We are Three Students from from [Data Science 420: Machine Learning Techniques](
 Python code for our [KDD Cup 2018](biendata.com/competition/kdd_2018) (Cup of Fresh Air) compeititon
 
 ![cobra icon](icons/snake.svg)
+
+We roll legit, citing our sources.
+<div>Icons made by <a href="https://www.flaticon.com/authors/roundicons" title="Roundicons">Roundicons</a> from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a> is licensed by <a href="http://creativecommons.org/licenses/by/3.0/" title="Creative Commons BY 3.0" target="_blank">CC 3.0 BY</a></div>
