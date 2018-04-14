@@ -29,6 +29,7 @@
     <Folder Include="icons" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="kdd_tutotial_data_import.py" />
     <Compile Include="test.py" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
