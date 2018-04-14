@@ -3,7 +3,7 @@ We are Three Students from from [Data Science 420: Machine Learning Techniques](
 Python code for our [KDD Cup 2018](https://biendata.com/competition/kdd_2018/) (Cup of Fresh Air) compeititon
 
 ## We are:
-- Leo Salemann - GitHubber, Agilist, Pythonista, Viz-Kid
+- Leo  - GitHubber, Agilist, Pythonista, Viz-Kid
 - Yash
 
 ![cobra icon](icons/snake.svg)
