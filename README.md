@@ -4,6 +4,7 @@ Python code for our [KDD Cup 2018](https://biendata.com/competition/kdd_2018/) (
 
 ## We are:
 - Leo Salemann - GitHubber, Agilist, Pythonista, Viz-Kid
+- Yash
 
 ![cobra icon](icons/snake.svg)
 
