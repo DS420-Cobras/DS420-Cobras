@@ -1,0 +1,23 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.27428.2037
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "DS420-Cobras", "DS420-Cobras.pyproj", "{852BD744-3C4F-4232-B094-F49B5A6FA507}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{852BD744-3C4F-4232-B094-F49B5A6FA507}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{852BD744-3C4F-4232-B094-F49B5A6FA507}.Release|Any CPU.ActiveCfg = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {DC364EB6-307B-44C0-8731-38B2878CC728}
+	EndGlobalSection
+EndGlobal
