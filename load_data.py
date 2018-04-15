@@ -27,7 +27,9 @@ import requests
 
 # FUNCTION load_on_url()
 # Based on https://biendata.com/forum/view_post_category/9
-# # https://biendata.com/competition/airquality/{city}/{start_time}/{end_time}/2k0d1d8
+# Takes city, datatype, from/to date-times and builds urls for gettind data.
+# Also builds file paths for saving to csv
+# https://biendata.com/competition/airquality/{city}/{start_time}/{end_time}/2k0d1d8
 # https://biendata.com/competition/meteorology/{city}/{start_time}/{end_time}/2k0d1d8
 # https://biendata.com/competition/meteorology/{city}_grid/{start_time}/{end_time}/2k0d1d8
 def load_one_url (city, datatype, from_datetime, to_datetime):
