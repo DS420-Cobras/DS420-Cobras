@@ -16,3 +16,41 @@
 #           python load_data.py Both all 2018-03-01-0 2018-03-15-14 
 #             this will load all data for both cities between 
 #             March 1, 2018 midnight and March 15, 2018 2pm.
+#
+# based on https://www.tutorialspoint.com/python/python_command_line_arguments.htm
+#
+##################################################################################
+
+import sys, getopt
+
+def main(argv):
+   city = ''
+   datatype = ''
+   from_datetime = ''
+   to_datetime = ''
+   example = 'load_data.py -c <city> -d <datatype> -f <from datetime> -t <to datetime>'
+   try:
+      opts, args = getopt.getopt(argv,"hc:d:f:t:",["city=","datatype=","from_datetime=","to_datetime="])
+   except getopt.GetoptError:
+      print (example)
+      sys.exit(2)
+   for opt, arg in opts:
+      if opt == '-h':
+         print example
+         sys.exit()
+      elif opt in ("-c", "--city"):
+         city = arg
+      elif opt in ("-d", "--datatype"):
+         datatype = arg
+      elif opt in ("-f", "--from_datetime"):
+         from_datetime = arg
+      elif opt in ("-t", "--to_datetime"):
+         to_datetime = arg
+
+   print ('city is ' + city)
+   print ('datatype is ' + datatype)
+   print ('from: ' + from_datetime)
+   print ('to: ' + to_datetime)
+
+if __name__ == "__main__":
+   main(sys.argv[1:])
