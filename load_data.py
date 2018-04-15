@@ -22,6 +22,27 @@
 ##################################################################################
 
 import sys, getopt
+def load_one_datatype(city, datatype, from_datetime, to_datetime):
+    print ("----< in load_one_datatype() >----")
+    print ('city is ' + city)
+    print ('datatype is ' + datatype)
+    print ('from: ' + from_datetime)
+    print ('to: ' + to_datetime)
+    print (' ')
+
+def load_one_city(city, datatype, from_datetime, to_datetime):
+   #print ("----< in load_for_city() >----")
+   #print ('city is ' + city)
+   #print ('datatype is ' + datatype)
+   #print ('from: ' + from_datetime)
+   #print ('to: ' + to_datetime)
+   #print (' ')
+   if datatype == "all":
+       load_one_datatype(city, 'air', from_datetime, to_datetime)
+       load_one_datatype(city, 'met', from_datetime, to_datetime)
+       load_one_datatype(city, 'grid', from_datetime, to_datetime)
+   else:
+       load_one_datatype(city, datatype, from_datetime, to_datetime)
 
 def main(argv):
    city = ''
@@ -36,7 +57,7 @@ def main(argv):
       sys.exit(2)
    for opt, arg in opts:
       if opt == '-h':
-         print example
+         print (example)
          sys.exit()
       elif opt in ("-c", "--city"):
          city = arg
@@ -47,10 +68,16 @@ def main(argv):
       elif opt in ("-t", "--to_datetime"):
          to_datetime = arg
 
-   print ('city is ' + city)
-   print ('datatype is ' + datatype)
-   print ('from: ' + from_datetime)
-   print ('to: ' + to_datetime)
+   #print ('city is ' + city)
+   #print ('datatype is ' + datatype)
+   #print ('from: ' + from_datetime)
+   #print ('to: ' + to_datetime)
+
+   if city == "Both":
+       load_one_city('Beijing', datatype, from_datetime, to_datetime)
+       load_one_city('London', datatype, from_datetime, to_datetime)
+   else:
+       load_one_city(city, datatype, from_datetime, to_datetime)
 
 if __name__ == "__main__":
    main(sys.argv[1:])
