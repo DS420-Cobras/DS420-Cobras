@@ -11,7 +11,7 @@
     <OutputPath>.</OutputPath>
     <ProjectTypeGuids>{888888a0-9f3d-457c-b088-3a5042f75d52}</ProjectTypeGuids>
     <LaunchProvider>Standard Python launcher</LaunchProvider>
-    <InterpreterId />
+    <InterpreterId>Global|ContinuumAnalytics|Anaconda36-64</InterpreterId>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)' == 'Debug'" />
   <PropertyGroup Condition="'$(Configuration)' == 'Release'" />
@@ -23,6 +23,7 @@
     <Content Include="icons\snake_128.png" />
     <Content Include="icons\snake_256.png" />
     <Content Include="icons\snake_512.png" />
+    <Content Include="requirements.txt" />
     <Content Include="test1.txt" />
   </ItemGroup>
   <ItemGroup>
@@ -30,7 +31,13 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="kdd_tutotial_data_import.py" />
+    <Compile Include="load_data.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="test.py" />
+  </ItemGroup>
+  <ItemGroup>
+    <InterpreterReference Include="Global|ContinuumAnalytics|Anaconda36-64" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
 </Project>
