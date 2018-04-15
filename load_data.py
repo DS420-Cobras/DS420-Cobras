@@ -22,21 +22,39 @@
 ##################################################################################
 
 import sys, getopt
+
 def load_one_datatype(city, datatype, from_datetime, to_datetime):
+    from_year  = from_datetime[:4] #equiv. to left(from_datetime, 4)
+    from_month = from_datetime[5:7]
+    from_day   = from_datetime[8:10]
+    from_hour  = from_datetime[11:len(from_datetime)]
+
+    to_year  = to_datetime[:4] #equiv. to left(to_datetime, 4)
+    to_month = to_datetime[5:7]
+    to_day   = to_datetime[8:10]
+    to_hour  = to_datetime[11:len(to_datetime)]
+
     print ("----< in load_one_datatype() >----")
     print ('city is ' + city)
     print ('datatype is ' + datatype)
-    print ('from: ' + from_datetime)
-    print ('to: ' + to_datetime)
+    print ('from year: '  + from_year)
+    print ('from month: ' + from_month)
+    print ('from day: '   + from_day)
+    print ('from hour: '  + from_hour)
+
+    print ('to year: '  + to_year)
+    print ('to month: ' + to_month)
+    print ('to day: '   + to_day)
+    print ('to hour: '  + to_hour)
+
     print (' ')
 
+    url = 'https://biendata.com/competition/airquality/bj/2018-04-01-0/2018-04-01-23/2k0d1d8'
+
+
+
+
 def load_one_city(city, datatype, from_datetime, to_datetime):
-   #print ("----< in load_for_city() >----")
-   #print ('city is ' + city)
-   #print ('datatype is ' + datatype)
-   #print ('from: ' + from_datetime)
-   #print ('to: ' + to_datetime)
-   #print (' ')
    if datatype == "all":
        load_one_datatype(city, 'air', from_datetime, to_datetime)
        load_one_datatype(city, 'met', from_datetime, to_datetime)
@@ -67,11 +85,6 @@ def main(argv):
          from_datetime = arg
       elif opt in ("-t", "--to_datetime"):
          to_datetime = arg
-
-   #print ('city is ' + city)
-   #print ('datatype is ' + datatype)
-   #print ('from: ' + from_datetime)
-   #print ('to: ' + to_datetime)
 
    if city == "Both":
        load_one_city('Beijing', datatype, from_datetime, to_datetime)
