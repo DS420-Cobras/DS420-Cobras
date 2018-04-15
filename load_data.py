@@ -34,25 +34,54 @@ def load_one_datatype(city, datatype, from_datetime, to_datetime):
     to_day   = to_datetime[8:10]
     to_hour  = to_datetime[11:len(to_datetime)]
 
-    print ("----< in load_one_datatype() >----")
-    print ('city is ' + city)
-    print ('datatype is ' + datatype)
-    print ('from year: '  + from_year)
-    print ('from month: ' + from_month)
-    print ('from day: '   + from_day)
-    print ('from hour: '  + from_hour)
+    #print ("----< in load_one_datatype() >----")
+    #print ('city is ' + city)
+    #print ('datatype is ' + datatype)
+    #print ('from year: '  + from_year)
+    #print ('from month: ' + from_month)
+    #print ('from day: '   + from_day)
+    #print ('from hour: '  + from_hour)
 
-    print ('to year: '  + to_year)
-    print ('to month: ' + to_month)
-    print ('to day: '   + to_day)
-    print ('to hour: '  + to_hour)
+    #print ('to year: '  + to_year)
+    #print ('to month: ' + to_month)
+    #print ('to day: '   + to_day)
+    #print ('to hour: '  + to_hour)
 
-    print (' ')
+    #print (' ')
 
+    url = 'https://biendata.com/competition/meteorology/bj/2018-04-01-0/2018-04-01-23/2k0d1d8'
     url = 'https://biendata.com/competition/airquality/bj/2018-04-01-0/2018-04-01-23/2k0d1d8'
+    url = 'https://biendata.com/competition/meteorology/bj_grid/2018-04-01-0/2018-04-01-23/2k0d1d8'
+    url = 'https://biendata.com/competition/meteorology/ld/2018-04-01-0/2018-04-01-23/2k0d1d8'
+    url = 'https://biendata.com/competition/airquality/ld/2018-04-01-0/2018-04-01-23/2k0d1d8'
+    url = 'https://biendata.com/competition/meteorology/ld_grid/2018-04-01-0/2018-04-01-23/2k0d1d8'
 
+    url_preamble = 'https://biendata.com/competition/'
+    
+    if city == "London":
+        url_city = 'ld'
+    elif city == "Beijing":
+        url_city = 'bj'
+    else:
+        print("*** ERROR: unknown city " + city)
+        exit(9999)
 
+    if datatype == "air":
+        url_datatype = 'airquality/'
+    elif datatype == "met":
+        url_datatype = 'meteorology/'
+    elif datatype == "grid":
+        url_datatype = 'meteorology/'
+        url_city = url_city + '_grid'
+    else:
+        print("*** ERROR: unknown datatype " + datatype)
+        exit(9998)
 
+    url_from_datetime = '/' + from_year + '-' + from_month + '-' + from_day + '-' + from_hour
+    url_to_datetime   = '/' + to_year   + '-' + to_month   + '-' + to_day   + '-' + to_hour
+
+    url = url_preamble + url_datatype + url_city + url_from_datetime + url_to_datetime + '/2k0d1d8'
+    print (url)
 
 def load_one_city(city, datatype, from_datetime, to_datetime):
    if datatype == "all":
