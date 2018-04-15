@@ -22,32 +22,7 @@
 ##################################################################################
 
 import sys, getopt
-
-def load_one_datatype(city, datatype, from_datetime, to_datetime):
-    from_year  = from_datetime[:4] #equiv. to left(from_datetime, 4)
-    from_month = from_datetime[5:7]
-    from_day   = from_datetime[8:10]
-    from_hour  = from_datetime[11:len(from_datetime)]
-
-    to_year  = to_datetime[:4] #equiv. to left(to_datetime, 4)
-    to_month = to_datetime[5:7]
-    to_day   = to_datetime[8:10]
-    to_hour  = to_datetime[11:len(to_datetime)]
-
-    #print ("----< in load_one_datatype() >----")
-    #print ('city is ' + city)
-    #print ('datatype is ' + datatype)
-    #print ('from year: '  + from_year)
-    #print ('from month: ' + from_month)
-    #print ('from day: '   + from_day)
-    #print ('from hour: '  + from_hour)
-
-    #print ('to year: '  + to_year)
-    #print ('to month: ' + to_month)
-    #print ('to day: '   + to_day)
-    #print ('to hour: '  + to_hour)
-
-    #print (' ')
+def load_one_url (city, datatype, from_datetime, to_datetime):
 
     url = 'https://biendata.com/competition/meteorology/bj/2018-04-01-0/2018-04-01-23/2k0d1d8'
     url = 'https://biendata.com/competition/airquality/bj/2018-04-01-0/2018-04-01-23/2k0d1d8'
@@ -82,6 +57,58 @@ def load_one_datatype(city, datatype, from_datetime, to_datetime):
 
     url = url_preamble + url_datatype + url_city + url_from_datetime + url_to_datetime + '/2k0d1d8'
     print (url)
+
+
+def load_one_datatype(city, datatype, from_datetime, to_datetime):
+    from_year  = int(from_datetime[:4]) #equiv. to left(from_datetime, 4)
+    from_month = int(from_datetime[5:7])
+    from_day   = int(from_datetime[8:10])
+    from_hour  = int(from_datetime[11:len(from_datetime)])
+
+    to_year  = int(to_datetime[:4]) #equiv. to left(to_datetime, 4)
+    to_month = int(to_datetime[5:7])
+    to_day   = int( to_datetime[8:10])
+    to_hour  = int(to_datetime[11:len(to_datetime)])
+
+    year = from_year
+    if (from_year == to_year):
+        last_month = to_month
+    else:
+        last_month = 12
+
+
+
+    if ((from_year == to_year) and (from_month == to_month) and (from_day == to_day)):
+        last_hour = 23
+    else:
+        last_hour = to_hour
+
+    month = from_month
+    day = from_day
+    hour = from_hour
+
+    while year <= int(to_year):
+        print("year: " + str(year))
+        if (year == int(to_year)):
+            last_month = int(to_month)
+        while month <= last_month:
+            print("  month: " + str(month))
+            if ((year == int(to_year)) and (month == int(to_month))):
+                last_day = int(to_day)
+            elif (month == 2):
+                last_day = 28
+            elif (month in {9, 4, 6, 11}):
+                last_day = 30
+            else:
+                last_day = 31
+            
+            #while day <= last_day:
+            #    print (str(year) + "-" + str(month) + "-" + str(day))
+            #    day = day + 1
+            month = month + 1
+        year = year + 1
+        month = 1
+
 
 def load_one_city(city, datatype, from_datetime, to_datetime):
    if datatype == "all":
