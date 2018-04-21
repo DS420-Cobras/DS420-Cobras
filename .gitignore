@@ -103,3 +103,5 @@ ENV/
 \.DS_Store
 
 safe/
+
+\.vs/cobras/v15/\.suo
