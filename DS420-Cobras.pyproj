@@ -5,7 +5,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{852bd744-3c4f-4232-b094-f49b5a6fa507}</ProjectGuid>
     <ProjectHome />
-    <StartupFile>kdd_tutotial_data_import.py</StartupFile>
+    <StartupFile>main.py</StartupFile>
     <SearchPath />
     <WorkingDirectory>.</WorkingDirectory>
     <OutputPath>.</OutputPath>
@@ -23,18 +23,18 @@
     <Content Include="icons\snake_128.png" />
     <Content Include="icons\snake_256.png" />
     <Content Include="icons\snake_512.png" />
-    <Content Include="requirements.txt" />
-    <Content Include="test1.txt" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="icons" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="kdd_tutotial_data_import.py" />
     <Compile Include="load_data.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="test.py" />
+    <Compile Include="main.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="submit_preds.py" />
   </ItemGroup>
   <ItemGroup>
     <InterpreterReference Include="Global|ContinuumAnalytics|Anaconda36-64" />
