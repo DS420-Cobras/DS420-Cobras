@@ -9,6 +9,8 @@ class Test_test(unittest.TestCase):
         expectedKeys = [('Beijing', 'air'), ('Beijing', 'met'), ('Beijing', 'grid'), ('London', 'air'), ('London', 'met'), ('London', 'grid')]
         actualKeys = [key for key in allDf.keys()]
         self.assertEqual(expectedKeys, actualKeys)
+
+        self.assertEqual(1, 2-1)
         #print(allDf.keys())
 
         # Check if we got the same columns for the data frames
