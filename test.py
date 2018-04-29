@@ -9,6 +9,8 @@ class Test_test(unittest.TestCase):
         expectedKeys = [('Beijing', 'air'), ('Beijing', 'met'), ('Beijing', 'grid'), ('London', 'air'), ('London', 'met'), ('London', 'grid')]
         actualKeys = [key for key in allDf.keys()]
         self.assertEqual(expectedKeys, actualKeys)
+
+        self.assertEqual(1, 2-1)
         #print(allDf.keys())
 
         # Check if we got the same columns for the data frames
@@ -20,8 +22,8 @@ class Test_test(unittest.TestCase):
                             ('London', 'grid'):['id', 'station_id', 'time', 'weather', 'temperature', 'pressure', 'humidity', 'wind_direction', 'wind_speed']
 }
         for (key,colNames) in expectedColNames.items():
-            self.assertEqual(colNames, list(allDf[key]))
-            #print(key, list(values))
+            actColNames = list(allDf[key])
+            self.assertEqual(set(colNames), set(actColNames))
 
         # Check if we downloaded enough columns
         expectedLengths = {('Beijing', 'air'):(16625, 9), ('Beijing', 'met'):(9117, 9), ('Beijing', 'grid'):(330677, 9), ('London', 'air'):(9728, 9),
