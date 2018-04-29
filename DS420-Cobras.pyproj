@@ -5,7 +5,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{852bd744-3c4f-4232-b094-f49b5a6fa507}</ProjectGuid>
     <ProjectHome />
-    <StartupFile>main.py</StartupFile>
+    <StartupFile>fastPred.py</StartupFile>
     <SearchPath />
     <WorkingDirectory>.</WorkingDirectory>
     <OutputPath>.</OutputPath>
@@ -28,6 +28,10 @@
     <Folder Include="icons" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="create_submission.py" />
+    <Compile Include="fastPred.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="load_data.py">
       <SubType>Code</SubType>
     </Compile>
