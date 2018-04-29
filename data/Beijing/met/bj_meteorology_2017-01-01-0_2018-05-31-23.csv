@@ -12009,4 +12009,4 @@ id,station_id,time,weather,temperature,pressure,humidity,wind_speed,wind_directi
 3044460,fengtai_meo,2018-04-28 23:00:00,Cloudy,17.3,997.8,91.0,0.0,999017.0
 3044461,daxing_meo,2018-04-28 23:00:00,Hail,17.2,999.9,77.0,1.1,130.0
 3044462,fangshan_meo,2018-04-28 23:00:00,Hail,16.1,998.6,84.0,0.6,33.0
-3044463,xiayunling_meo,2018-04-28 23:00:00,Sunny/clear,14.1,958.0,79.0,0.3,342.0
+3044463,xiayunling_meo,2018-04-28 23:00:00,Sunny/clear,14.1,958.0,79.0,0.3,342.0
