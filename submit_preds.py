@@ -1,7 +1,7 @@
 import requests
 import sys
 import getopt
-team_token = ''
+team_token = '4d53493e18e23fe27fde8757a56693f7fed5f663dbffe730c15081f81a4f0f8b'
 
 def submit_preds(csv, user_id, description, filename):
 	files={'files': open(csv,'rb')}
