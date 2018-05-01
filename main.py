@@ -72,7 +72,7 @@ testDf = bejDf[bejDf['time'] >= splitDate]
 targets = ['PM25_Concentration', 'PM10_Concentration', 'NO2_Concentration', 'CO_Concentration', 'O3_Concentration', 'SO2_Concentration']
 features = [col for col in list(testDf) if ((col not in targets) and (col != 'time'))]
 
-print(trainDf[features].head(20))
+#print(trainDf[features].head(20))
 
 #lm = sklearn.linear_model.LinearRegression(n_jobs=-1)
 lm = sklearn.ensemble.RandomForestRegressor(n_jobs=-1, random_state=42)
@@ -84,4 +84,7 @@ print(lm.score(testDf[features], testDf['PM10_Concentration']))
 
 predictedValues = lm.predict(testDf[features])
 actualValues = testDf['PM10_Concentration']
-plot.CreateMultiplePredictedAndActualValuesPlots([predictedValues], [actualValues], 'LinearRegression')
+mn = bejDf['PM10_Concentration'].mean()
+for i in range(len(predictedValues)):
+    predictedValues[i] = mn
+#plot.CreateMultiplePredictedAndActualValuesPlots([predictedValues], [actualValues], 'LinearRegression')
