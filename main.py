@@ -132,7 +132,27 @@ features = [col for col in list(testDf) if ((col not in targets) and (col != 'ti
 #lm = sklearn.linear_model.LinearRegression(n_jobs=-1)
 lm = sklearn.ensemble.RandomForestRegressor(n_jobs=-1, random_state=42)
 lm.fit(trainDf[features], trainDf[targets])
-print(lm.score(testDf[features], testDf[targets]))
+#print(lm.score(testDf[features], testDf[targets]))
+
+importances = lm.feature_importances_
+std = np.std([tree.feature_importances_ for tree in lm.estimators_],
+             axis=0)
+indices = np.argsort(importances)[::-1]
+
+# Print the feature ranking
+print("Feature ranking:")
+
+for f in range(trainDf[features].shape[1]):
+    print("%d. feature %d (%f)" % (f + 1, indices[f], importances[indices[f]]))
+
+# Plot the feature importances of the random forest model
+plt.figure(figsize=(20,10))
+plt.title("Feature importances")
+plt.bar(range(trainDf[features].shape[1]), importances[indices],
+       color="r", yerr=std[indices], align="center")
+plt.xticks(range(trainDf[features].shape[1]), indices)
+plt.xlim([-1, trainDf[features].shape[1]])
+plt.show()
 
 #lm.fit(trainDf[features], trainDf['PM10_Concentration'])
 #print(lm.score(testDf[features], testDf['PM10_Concentration']))
