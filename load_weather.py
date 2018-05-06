@@ -50,7 +50,7 @@ def getWeatherDataRange(startDate, endDate, stationsNeeded, cityName, shortRun =
     count = 0
     station_met =  pd.read_csv('viz\\' + cityName + '_points.csv')
     for stations in stationsNeeded:
-        if count == 3 and shortRun:
+        if count == 0 and shortRun:
             break
         stationInfo = station_met[station_met['station_id'] == stations]
         print(str(stationInfo['station_id'].values[0]))
