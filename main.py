@@ -8,12 +8,96 @@ import time
 import datetime
 import numpy as np
 import sklearn.preprocessing
+import load_weather
 
 allDf = load_data.getPandasDataframes()
+
+beijingWeatherLoaded = ['aotizhongxin_aq','badaling_aq','beibuxinqu_aq','daxing_aq','dingling_aq','donggaocun_aq','dongsi_aq','dongsihuan_aq','fangshan_aq','fengtaihuayuan_aq',
+'guanyuan_aq','gucheng_aq','huairou_aq','liulihe_aq','mentougou_aq','miyun_aq','miyunshuiku_aq','nansanhuan_aq','nongzhanguan_aq','pingchang_aq','pinggu_aq',
+'qianmen_aq','shunyi_aq','tiantan_aq','tongzhou_aq','wanliu_aq','wanshouxigong_aq','xizhimenbei_aq','yanqin_aq','yizhuang_aq','yongdingmennei_aq']
+
+def doAnalysis2(cityBej = True):
+    "Perform full analysis on the specified city"
+    cityName = 'Beijing' if cityBej else "London"
+    # Air data
+    bejDf = allDf[(cityName, 'air')]
+    bejDf['time'] = pd.to_datetime(bejDf['time'], errors='coerce', format='%Y-%m-%d %H:%M:%S')
+
+    startDate = np.min(bejDf['time'])
+    now = datetime.datetime.utcnow()
+    endDate = datetime.datetime.strptime(str(now.date().year) + '-' + str(now.date().month) + '-' + str(now.date().day), '%Y-%m-%d') + datetime.timedelta(hours=72)
+
+    stationsNeeded = np.unique(bejDf['station_id'])
+
+    weatherDf = load_weather.getWeatherDataRange(startDate, endDate, stationsNeeded, cityName, True)
+    weatherDf['time'] = weatherDf['datetime']
+
+    # ToDo: Change inner join to left join
+    bejDf = bejDf.merge(weatherDf, how='inner', on=['station_id', 'time'])
+
+    bejDf.drop(labels='id', axis=1, inplace=True)
+    bejDf.drop(labels='datetime', axis=1, inplace=True)
+    bejDf.drop(labels='lat', axis=1, inplace=True)
+    bejDf.drop(labels='long', axis=1, inplace=True)
+    
+    # ToDo: Undo. Removed because they have a lot of empty cells. Replace with more meaningful values
+    bejDf.drop(labels='ozone', axis=1, inplace=True)
+    bejDf.drop(labels='precipIntensity', axis=1, inplace=True)
+    bejDf.drop(labels='precipProbability', axis=1, inplace=True)
+    bejDf.drop(labels='pressure', axis=1, inplace=True)
+    bejDf.drop(labels='uvIndex', axis=1, inplace=True)
+    bejDf.drop(labels='windGust', axis=1, inplace=True)
+    bejDf.drop(labels='cloudCover', axis=1, inplace=True)
+    bejDf.drop(labels='precipType', axis=1, inplace=True)
+    bejDf.drop(labels='visibility', axis=1, inplace=True)
+
+    bejDf['hour'] = bejDf['time'].dt.hour
+    bejDf['day'] = bejDf['time'].dt.day
+    bejDf['month'] = bejDf['time'].dt.month
+    bejDf['dayofweek'] = bejDf['time'].dt.dayofweek
+
+    # Business Hours Variable (between 8am and 6pm)
+    #bejDf['businessHours'] = 0
+    #bejDf.loc[(bejDf['hour'] >= 8) & (bejDf['hour']<=18)==0, 'businessHours'] = 1
+
+    bejDf.dropna(inplace=True)
+
+    bejDf['summary'] = bejDf['summary'].astype('category')
+    bejDf['icon'] = bejDf['icon'].astype('category')
+
+    # Handle categorical data
+    bejDf = pd.get_dummies(bejDf, 'dum')
+
+    # What predictions do we get without direct time component?
+    bejDf.drop(labels='time', axis=1, inplace=True)
+
+    #bejDf.to_csv('temp.csv', index=False)
+
+    targets = ['PM25_Concentration', 'PM10_Concentration', 'NO2_Concentration', 'CO_Concentration', 'O3_Concentration', 'SO2_Concentration']
+    features = [col for col in list(bejDf) if (col not in targets)]
+
+    target = ['PM10_Concentration']
+
+    # K-Fold cross validation
+    kf = sklearn.model_selection.KFold(n_splits=5, shuffle=True, random_state=42)
+    bejDf.reset_index(drop=True)
+    for train_index, test_index in kf.split(bejDf):
+        X_train, X_test = bejDf.iloc[train_index][features], bejDf.iloc[test_index][features]
+        Y_train = bejDf.iloc[train_index][target]
+        Y_test = bejDf.iloc[test_index][target]
+
+        lm = sklearn.ensemble.RandomForestRegressor(n_jobs=-1, random_state=42)
+        lm.fit(X_train, Y_train)
+        print(lm.score(X_test, Y_test))
+
+
 
 def doAnalysis(cityBej=True):
     "Name of the city for which we are doing analysis"
     cityName = 'Beijing' if cityBej else "London"
+
+    # Air data
+    bejDf = allDf[(cityName, 'air')]
 
     # Met data
     if cityBej:
@@ -25,9 +109,6 @@ def doAnalysis(cityBej=True):
     bejGrd = allDf[(cityName, 'grid')]
     bejGrd['time'] = pd.to_datetime(bejGrd['time'], errors='coerce', format='%Y-%m-%d %H:%M:%S')
     bejGrd = bejGrd.rename(columns={'station_id':'met_station'})
-
-    # Air data
-    bejDf = allDf[(cityName, 'air')]
 
     if not cityBej:
         bejDf.drop(labels=['CO_Concentration', 'O3_Concentration', 'SO2_Concentration'], axis=1, inplace=True)
@@ -161,5 +242,6 @@ def doAnalysis(cityBej=True):
         f.set_figwidth(15)
         plt.show()
 
-doAnalysis(cityBej=True)
+doAnalysis2(cityBej=True)
+#doAnalysis2(cityBej=False)
 #doAnalysis(cityBej=False)
