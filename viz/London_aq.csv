@@ -1,0 +1,25 @@
+﻿station_id,latitude,longitude,StationType,SubType,Description
+BX9,51.46598327,0.184877127,aq,Suburban,Bexley - Slade Green FDMS
+BX1,51.46598327,0.184877127,aq,Suburban,Bexley - Slade Green
+BL0,51.522287,-0.125848,aq,Urban Background,Camden - Bloomsbury
+CD9,51.52770662,-0.129053205,aq,Roadside,Camden - Euston Road
+CD1,51.544219,-0.175284,aq,Kerbside,Camden - Swiss Cottage
+CT2,51.51452534,-0.104515626,aq,Kerbside,City of London - Farringdon Street
+CT3,51.51384718,-0.077765682,aq,Urban Background,City of London - Sir John Cass School
+CR8,51.410039,-0.127523,aq,Urban Background,Croydon - Norbury Manor
+GN0,51.490532,0.074003,aq,Roadside,Greenwich - A206 Burrage Grove
+GR4,51.45258,0.070766,aq,Suburban,Greenwich - Eltham
+GN3,51.486957,0.095111,aq,Roadside,Greenwich - Plumstead High Street
+GR9,51.456357,0.040725,aq,Roadside,Greenwich - Westhorne Avenue
+GB0,51.4563,0.085606,aq,Roadside,Greenwich and Bexley - Falconwood FDMS
+HR1,51.617327,-0.298775,aq,Urban Background,Harrow - Stanmore
+HV1,51.52078746,0.205460706,aq,Roadside,Havering - Rainham
+LH0,51.48878,-0.441627,aq,Urban Background,Hillingdon - Harlington
+KC1,51.52104675,-0.21349214,aq,Urban Background,Kensington and Chelsea - North Ken
+KF1,51.52104675,-0.21349214,aq,Urban Background,Kensington and Chelsea - North Ken FIDAS
+LW2,51.474954,-0.039641,aq,Roadside,Lewisham - New Cross
+RB7,51.56948433,0.082907475,aq,Urban Background,Redbridge - Ley Street
+TD5,51.42525604,-0.345608291,aq,Suburban,Richmond Upon Thames - Bushy Park
+ST5,51.3892869,-0.141661525,aq,Industrial,Sutton - Beddington Lane north
+TH4,51.51504617,-0.008418493,aq,Roadside,Tower Hamlets - Blackwall
+MY7,51.52254,-0.15459,aq,Kerbside,Westminster - Marylebone Road FDMS
