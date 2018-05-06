@@ -7,8 +7,9 @@ from calendar import monthrange
 import os.path
 import datetime
 
-#api_key = '276d9b4ae748ec5d42ab2ababe8435cc' #apikey obtained from darksky.net 
-api_key = '999653ec682af395046067847b4f4948' #apikey obtained from darksky.net by Yash
+api_key = '276d9b4ae748ec5d42ab2ababe8435cc' #apikey obtained from darksky.net 
+#api_key = '999653ec682af395046067847b4f4948' #apikey obtained from darksky.net by Yash
+#api_key = '40a186e05ecf67b4dfd467472fdd35bb' #another apikey obtained from darksky.net by Yash
 
 
 def get_met_data(start_date, numdays, api_key, lat, lng, station_id):
@@ -50,7 +51,7 @@ def getWeatherDataRange(startDate, endDate, stationsNeeded, cityName, shortRun =
     count = 0
     station_met =  pd.read_csv('viz\\' + cityName + '_points.csv')
     for stations in stationsNeeded:
-        if count == 0 and shortRun:
+        if count == 3 and shortRun:
             break
         stationInfo = station_met[station_met['station_id'] == stations]
         print(str(stationInfo['station_id'].values[0]))
