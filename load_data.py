@@ -33,7 +33,7 @@ import pandas as pd
 
 def doesFileNeedUpdate(filename):
     "This function checks whether this file needs to be downloaded or whether local cache is fine"
-    #return False
+    #return True
     if not os.path.exists(filename):
         return True
     ftime = os.path.getmtime(filename)
