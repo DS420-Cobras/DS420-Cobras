@@ -79,20 +79,42 @@ def doAnalysis2(cityBej = True):
     
     # ToDo: Undo. Removed because they have a lot of empty cells. Replace with more meaningful values
     bejDf.drop(labels='ozone', axis=1, inplace=True)
+    submissionDf.drop(labels='ozone', axis=1, inplace=True)
+
     bejDf.drop(labels='precipIntensity', axis=1, inplace=True)
+    submissionDf.drop(labels='precipIntensity', axis=1, inplace=True)
+
     bejDf.drop(labels='precipProbability', axis=1, inplace=True)
+    submissionDf.drop(labels='precipProbability', axis=1, inplace=True)
+
     bejDf.drop(labels='pressure', axis=1, inplace=True)
+    submissionDf.drop(labels='pressure', axis=1, inplace=True)
+
     bejDf.drop(labels='uvIndex', axis=1, inplace=True)
+    submissionDf.drop(labels='uvIndex', axis=1, inplace=True)
+
     bejDf.drop(labels='windGust', axis=1, inplace=True)
+    submissionDf.drop(labels='windGust', axis=1, inplace=True)
+
     bejDf.drop(labels='cloudCover', axis=1, inplace=True)
+    submissionDf.drop(labels='cloudCover', axis=1, inplace=True)
+
     bejDf.drop(labels='precipType', axis=1, inplace=True)
+    submissionDf.drop(labels='precipType', axis=1, inplace=True)
+
     bejDf.drop(labels='visibility', axis=1, inplace=True)
+    submissionDf.drop(labels='visibility', axis=1, inplace=True)
 
     # ToDo: Make these categorical
     bejDf['hour'] = bejDf['time'].dt.hour
     bejDf['day'] = bejDf['time'].dt.day
     bejDf['month'] = bejDf['time'].dt.month
     bejDf['dayofweek'] = bejDf['time'].dt.dayofweek
+
+    submissionDf['hour'] = submissionDf['time'].dt.hour
+    submissionDf['day'] = submissionDf['time'].dt.day
+    submissionDf['month'] = submissionDf['time'].dt.month
+    submissionDf['dayofweek'] = submissionDf['time'].dt.dayofweek
 
     # Business Hours Variable (between 8am and 6pm)
     #bejDf['businessHours'] = 0
@@ -116,6 +138,10 @@ def doAnalysis2(cityBej = True):
 
     bejDf['summary'] = bejDf['summary'].astype('category')
     bejDf['icon'] = bejDf['icon'].astype('category')
+    submissionDf['summary'] = submissionDf['summary'].astype('category')
+    submissionDf['icon'] = submissionDf['icon'].astype('category')
+
+    submissionDf['name'] = submissionDf['station_id'] + '#' + submissionDf['time'].dt.hour.apply(str)
 
     # Handle categorical data
     # ToDo: Use drop_first  and dummy_na arguments of get_dummies and move this method before drop_na

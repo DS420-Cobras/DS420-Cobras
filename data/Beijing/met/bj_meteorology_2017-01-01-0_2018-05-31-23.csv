@@ -15329,4 +15329,4 @@ id,station_id,time,weather,temperature,pressure,humidity,wind_speed,wind_directi
 3332599,fengtai_meo,2018-05-06 23:00:00,Sunny/clear,20.0,1003.8,52.0,2.0,48.0
 3332600,daxing_meo,2018-05-06 23:00:00,Hail,17.3,1005.5,82.0,1.1,48.0
 3332601,fangshan_meo,2018-05-06 23:00:00,Sunny/clear,18.8,1004.4,56.0,1.6,63.0
-3332602,xiayunling_meo,2018-05-06 23:00:00,Sunny/clear,13.3,963.4,75.0,0.6,117.0
+3332602,xiayunling_meo,2018-05-06 23:00:00,Sunny/clear,13.3,963.4,75.0,0.6,117.0
