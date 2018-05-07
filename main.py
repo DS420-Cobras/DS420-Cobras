@@ -51,22 +51,26 @@ def doAnalysis2(cityBej = True):
     for col in bejDfCols:
         if col not in list(submissionDf):
             submissionDf[col] = bejDf.iloc[0][col]
+    # We need ids to debug duplicate rows
+    idStart = np.max(bejDf['id']) + 1
+    for index, row in submissionDf.iterrows():
+        submissionDf.at[index, 'id'] = idStart
+        idStart += 1
+
     submissionCount = len(submissionDf)
 
     # Merge the two together for feature engineering part. We will separate them out later on
     bejDf = pd.concat([bejDf, submissionDf])
     submissionDf = None
 
-    # Do not fit over all the stations. Only fit over the stations we want. The benefit is that we have less data to deal with and less cleanup later on
-    # The disadvantage is overfitting. ToDo: Fix this later.
-    bejDf = bejDf[bejDf['station_id'].isin(stationlist)]
-
     stationsNeeded = np.unique(bejDf['station_id'])
 
     weatherDf = load_weather.getWeatherDataRange(startDate, endDate, stationsNeeded, cityName, False)
     weatherDf['time'] = weatherDf['datetime']
+    assert(len(weatherDf[weatherDf[['station_id', 'time']].duplicated()]) == 0)
 
-    # ToDo: Change inner join to left join
+    # We are okay with the inner join because of the assert statement immediately afterwards.
+    # What we are saying here is that if the weather data is not available for a certain station at a certain time, then we will not do this analysis at all
     prev = len(bejDf)
     bejDf = bejDf.merge(weatherDf, how='inner', on=['station_id', 'time'])
     assert(len(bejDf) == prev) # We have weather data corresponding to all of the input data
@@ -79,44 +83,31 @@ def doAnalysis2(cityBej = True):
     
     # ToDo: Undo. Removed because they have a lot of empty cells. Replace with more meaningful values
     bejDf.drop(labels='ozone', axis=1, inplace=True)
-    submissionDf.drop(labels='ozone', axis=1, inplace=True)
-
     bejDf.drop(labels='precipIntensity', axis=1, inplace=True)
-    submissionDf.drop(labels='precipIntensity', axis=1, inplace=True)
-
     bejDf.drop(labels='precipProbability', axis=1, inplace=True)
-    submissionDf.drop(labels='precipProbability', axis=1, inplace=True)
-
     bejDf.drop(labels='pressure', axis=1, inplace=True)
-    submissionDf.drop(labels='pressure', axis=1, inplace=True)
-
     bejDf.drop(labels='uvIndex', axis=1, inplace=True)
-    submissionDf.drop(labels='uvIndex', axis=1, inplace=True)
-
     bejDf.drop(labels='windGust', axis=1, inplace=True)
-    submissionDf.drop(labels='windGust', axis=1, inplace=True)
-
     bejDf.drop(labels='cloudCover', axis=1, inplace=True)
-    submissionDf.drop(labels='cloudCover', axis=1, inplace=True)
-
     bejDf.drop(labels='precipType', axis=1, inplace=True)
-    submissionDf.drop(labels='precipType', axis=1, inplace=True)
-
     bejDf.drop(labels='visibility', axis=1, inplace=True)
-    submissionDf.drop(labels='visibility', axis=1, inplace=True)
 
-    # ToDo: Make these categorical
     bejDf['hour'] = bejDf['time'].dt.hour
     bejDf['day'] = bejDf['time'].dt.day
     bejDf['month'] = bejDf['time'].dt.month
     bejDf['dayofweek'] = bejDf['time'].dt.dayofweek
 
-    submissionDf['hour'] = submissionDf['time'].dt.hour
-    submissionDf['day'] = submissionDf['time'].dt.day
-    submissionDf['month'] = submissionDf['time'].dt.month
-    submissionDf['dayofweek'] = submissionDf['time'].dt.dayofweek
+    # Making these categorical reduces the accuracy marginally. We will therefore keep the variables above integer for now.
+    #bejDf['hour'] = bejDf['hour'].apply(lambda x:'hour'+str(x))
+    #bejDf['hour'] = bejDf['hour'].astype('category')
+    #bejDf['day'] = bejDf['day'].apply(lambda x:'day'+str(x))
+    #bejDf['day'] = bejDf['day'].astype('category')
+    #bejDf['month'] = bejDf['month'].apply(lambda x:'month'+str(x))
+    #bejDf['month'] = bejDf['month'].astype('category')
+    #bejDf['dayofweek'] = bejDf['dayofweek'].apply(lambda x:'dayofweek'+str(x))
+    #bejDf['dayofweek'] = bejDf['dayofweek'].astype('category')
 
-    # Business Hours Variable (between 8am and 6pm)
+    # Business Hours Variable (between 8am and 6pm).
     #bejDf['businessHours'] = 0
     #bejDf.loc[(bejDf['hour'] >= 8) & (bejDf['hour']<=18)==0, 'businessHours'] = 1
 
@@ -138,16 +129,12 @@ def doAnalysis2(cityBej = True):
 
     bejDf['summary'] = bejDf['summary'].astype('category')
     bejDf['icon'] = bejDf['icon'].astype('category')
-    submissionDf['summary'] = submissionDf['summary'].astype('category')
-    submissionDf['icon'] = submissionDf['icon'].astype('category')
-
-    submissionDf['name'] = submissionDf['station_id'] + '#' + submissionDf['time'].dt.hour.apply(str)
 
     # Handle categorical data
-    # ToDo: Use drop_first  and dummy_na arguments of get_dummies and move this method before drop_na
+    # ToDo: Use dummy_na argument of get_dummies and move this method before drop_na
     test_id = bejDf['test_id']
     bejDf.drop(labels='test_id', axis=1, inplace=True)
-    bejDf = pd.get_dummies(bejDf, 'dum')
+    bejDf = pd.get_dummies(bejDf, prefix='dum', drop_first=True)
     bejDf['test_id'] = test_id
 
     # What predictions do we get without direct time component?

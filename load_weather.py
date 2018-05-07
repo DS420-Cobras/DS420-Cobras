@@ -68,6 +68,7 @@ def getWeatherDataRange(startDate, endDate, stationsNeeded, cityName, shortRun =
                 cached = pd.concat([cached, get_met_data(dates, 1, api_key, float(stationInfo['latitude']), float(stationInfo['longitude']), str(stationInfo['station_id'].values[0]) )])
         for i in range(5): # Try 5 times
             cached = cached[np.logical_not(cached.duplicated())] # Remove duplicates if they somehow make it into the system
+            cached = cached[np.logical_not(cached[['station_id', 'time']].duplicated())]
             try:
                 cached.to_csv(os.path.join('viz', cityName + '_weather.csv'), index=False)
             except:
