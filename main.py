@@ -218,8 +218,8 @@ def doAnalysis2(cityBej = True):
             Y_train, Y_test = df.iloc[train_index][[target]], df.iloc[test_index][[target]]
 
             lm.fit(X_train, Y_train.values.ravel())
-            #Y_predicted = np.abs(lm.predict(X_test))
-            Y_predicted = lm.predict(X_test)
+            Y_predicted = np.abs(lm.predict(X_test))
+            #Y_predicted = lm.predict(X_test)
             #score = sklearn.metrics.r2_score(Y_test, Y_predicted)
             score = smape(Y_test, Y_predicted)
             modelScores.append((score, lm))
@@ -229,7 +229,7 @@ def doAnalysis2(cityBej = True):
         print(target, [val[0] for val in modelScores], scoreUsed)
 
         # Use the best model for making predictions
-        bejDf.loc[bejDf['test_id'] != 'None', target] = modelUsed.predict(bejDf.loc[bejDf['test_id'] != 'None', features])
+        bejDf.loc[bejDf['test_id'] != 'None', target] = np.abs(modelUsed.predict(bejDf.loc[bejDf['test_id'] != 'None', features]))
     retainColumns = ['test_id']
     retainColumns += targets
     for col in list(bejDf):
@@ -259,7 +259,8 @@ combDf = pd.concat([bejSubDf, lonSubDf])
 dt = datetime.datetime.utcnow()
 filename = 'mainSubmission' + "_" + str(dt.date().day) + "_ " + str(dt.date().month) + "_" + str(dt.date().year) + "_" + str(dt.time().hour) + "_" + str(dt.time().minute) + "_" + str(dt.time().second) + ".csv"
 filename = os.path.join("Submissions", filename)
+
 """
 combDf.to_csv(filename, index=False, sep=',', columns=['test_id', 'PM2.5', 'PM10', 'O3'])
-#submit_preds.submit_preds(filename, 'yashbhandari', 'Sample means', filename=filename)
+submit_preds.submit_preds(filename, 'yashbhandari', 'Sample means', filename=filename)
 """
