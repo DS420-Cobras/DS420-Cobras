@@ -42,6 +42,8 @@ def getWeatherDataRange(startDate, endDate, stationsNeeded, cityName, shortRun =
     if 'datetime' in set(cached):
         cached['datetime'] = pd.to_datetime(cached['datetime'], errors='coerce', format='%Y-%m-%d %H:%M:%S')
 
+    alreadyHave = {(row[1],row[2]) for row in cached.loc[:, ['station_id', 'datetime']].itertuples()}
+
     datesNeeded = []
     curDate = startDate
     while curDate <= endDate:
@@ -54,26 +56,24 @@ def getWeatherDataRange(startDate, endDate, stationsNeeded, cityName, shortRun =
             break
         stationInfo = station_met[station_met['station_id'] == stations]
         print(str(stationInfo['station_id'].values[0]))
+        prevCount = count
         for dates in datesNeeded:
             if count == 3 and shortRun:
                 break
-            flag = True
-            if 'datetime' in set(cached):
-                tempDf = cached[(cached['station_id'] == stations)]
-                tempDf = tempDf[tempDf['datetime'] == dates ]
-                if not tempDf.empty:
-                    flag = False
-            if flag:
+            if (stations, dates) not in alreadyHave:
                 count += 1
                 cached = pd.concat([cached, get_met_data(dates, 1, api_key, float(stationInfo['latitude']), float(stationInfo['longitude']), str(stationInfo['station_id'].values[0]) )])
         for i in range(5): # Try 5 times
             cached = cached[np.logical_not(cached.duplicated())] # Remove duplicates if they somehow make it into the system
             cached = cached[np.logical_not(cached[['station_id', 'time']].duplicated())]
-            try:
-                cached.to_csv(os.path.join('viz', cityName + '_weather.csv'), index=False)
-            except:
-                if i == 4:
-                    raise
-            else:
-                break
+            if cached['time'].dtype == np.dtype('O'):
+                cached['time'] = pd.to_datetime(cached['time'], errors='coerce', format='%Y-%m-%d %H:%M:%S')
+            if count != prevCount: # Only write to file if we loaded something from internet
+                try:
+                    cached.to_csv(os.path.join('viz', cityName + '_weather.csv'), index=False)
+                except:
+                    if i == 4:
+                        raise
+                else:
+                    break
     return cached

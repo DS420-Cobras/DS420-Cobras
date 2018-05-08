@@ -11,8 +11,47 @@ import sklearn.preprocessing
 import load_weather
 from itertools import product
 import submit_preds
+import os.path
 
 allDf = load_data.getPandasDataframes()
+
+# Copied from discussion forum
+#def calc_smape(labels, forecasts): 
+#    # arrange both indices 
+#    forecasts = forecasts.loc[labels.index].copy() # calc symmetric absolute percentage error (not SMAPE) 
+#    sape_df = ((labels-forecasts).abs()/((labels+forecasts)/2)) # set sape value 0 if actual value and forecast value are both 0 
+#    sape_df[(labels==0)&(forecasts==0)] = 0 # form the dataframe in line, drop nan, and calc SMAPE 
+#    sape_array = sape_df.values.reshape([-1]) 
+#    smape = sape_array[~np.isnan(sape_array)].mean() 
+#    return smape # labels and forecasts have same format 
+
+def smape(actual, predicted):
+    dividend= np.abs(np.array(actual) - np.array(predicted))
+    denominator = np.array(actual) + np.array(predicted)
+    
+    return 2 * np.mean(np.divide(dividend, denominator, out=np.zeros_like(dividend), where=denominator!=0, casting='unsafe'))
+
+class MeansFit(sklearn.base.RegressorMixin):
+    "Predict the mean value"
+    def __init__(self, features=[]):
+        # We are doing cheating here. We are adding station_id in the features list
+        if 'station_id' not in features:
+            features.append('station_id')
+    
+    def fit(self, X, Y):
+        self.groupMeans_ = {}
+        self.overallMean_ = np.mean(Y)
+        df = X.copy()
+        df['target'] = Y
+        for index, row in df.groupby(['station_id']).mean().iterrows():
+            v = row['target']
+            self.groupMeans_[index] = self.overallMean_ if np.isnan(v) else v
+        df = None
+        return self
+
+    def predict(self, X):
+        values = [(self.groupMeans_[station] if station in self.groupMeans_ else self.overallMean_) for station in X['station_id'] ]
+        return np.asarray(values)
 
 def doAnalysis2(cityBej = True):
     "Perform full analysis on the specified city"
@@ -72,8 +111,10 @@ def doAnalysis2(cityBej = True):
     # We are okay with the inner join because of the assert statement immediately afterwards.
     # What we are saying here is that if the weather data is not available for a certain station at a certain time, then we will not do this analysis at all
     prev = len(bejDf)
-    bejDf = bejDf.merge(weatherDf, how='inner', on=['station_id', 'time'])
-    assert(len(bejDf) == prev) # We have weather data corresponding to all of the input data
+    newBejDf = bejDf.merge(weatherDf, how='inner', on=['station_id', 'time']) # Created newBejDf to help with debugging
+    assert(len(newBejDf) == prev) # We have weather data corresponding to all of the input data
+    bejDf = newBejDf
+    newBejDf = None
     assert(len(bejDf[bejDf['test_id'] != "None"]) == submissionCount) # We did not lose a single line for submission file
 
     bejDf.drop(labels='id', axis=1, inplace=True)
@@ -92,12 +133,11 @@ def doAnalysis2(cityBej = True):
     bejDf.drop(labels='precipType', axis=1, inplace=True)
     bejDf.drop(labels='visibility', axis=1, inplace=True)
 
+    # Make categorical columns for for time based attributes
     bejDf['hour'] = bejDf['time'].dt.hour
     bejDf['day'] = bejDf['time'].dt.day
     bejDf['month'] = bejDf['time'].dt.month
     bejDf['dayofweek'] = bejDf['time'].dt.dayofweek
-
-    # Making these categorical reduces the accuracy marginally. We will therefore keep the variables above integer for now.
     #bejDf['hour'] = bejDf['hour'].apply(lambda x:'hour'+str(x))
     #bejDf['hour'] = bejDf['hour'].astype('category')
     #bejDf['day'] = bejDf['day'].apply(lambda x:'day'+str(x))
@@ -122,6 +162,12 @@ def doAnalysis2(cityBej = True):
         bejDf.drop(labels='CO_Concentration', axis=1, inplace=True)
         bejDf.drop(labels='SO2_Concentration', axis=1, inplace=True)
 
+    # Do not include negative values in the target columns
+    negTargetColumns = ['PM25_Concentration', 'PM10_Concentration', 'O3_Concentration']
+    for col in negTargetColumns:
+        if col in set(bejDf):
+            bejDf.loc[bejDf[col]<0, col] =np.NaN
+
     # ToDo: Come up with a strategy for handling na values
     bejDf.dropna(inplace=True)
     assert(len(bejDf[bejDf['test_id'] != "None"]) == submissionCount) # We did not lose a single line of submission file
@@ -133,9 +179,11 @@ def doAnalysis2(cityBej = True):
     # Handle categorical data
     # ToDo: Use dummy_na argument of get_dummies and move this method before drop_na
     test_id = bejDf['test_id']
+    station_id = bejDf['station_id'] # Keeping this alive for means prediction
     bejDf.drop(labels='test_id', axis=1, inplace=True)
     bejDf = pd.get_dummies(bejDf, prefix='dum', drop_first=True)
     bejDf['test_id'] = test_id
+    bejDf['station_id'] = station_id
 
     # What predictions do we get without direct time component?
     bejDf.drop(labels='time', axis=1, inplace=True)
@@ -146,8 +194,9 @@ def doAnalysis2(cityBej = True):
         targets = ['PM25_Concentration', 'PM10_Concentration']
     features = [col for col in list(bejDf) if (col not in targets)]
     features.remove('test_id')
+    features.remove('station_id')
 
-    assert((set(bejDf) - set(targets) - set(features)) == {'test_id'})
+    assert((set(bejDf) - set(targets) - set(features)) == {'test_id', 'station_id'})
     assert(len(bejDf[bejDf['test_id'] != "None"]) == submissionCount) # We did not lose a single line of submission file
 
     # Now, just before we begin modeling, we seperate out the supplied data
@@ -159,16 +208,24 @@ def doAnalysis2(cityBej = True):
         kf = sklearn.model_selection.KFold(n_splits=5, shuffle=True, random_state=42)
         modelScores = []
         for train_index, test_index in kf.split(df):
+            if False:
+                lm = MeansFit(features)
+            else:
+                lm = sklearn.ensemble.RandomForestRegressor(n_jobs=-1, random_state=42, criterion='mse')
+                #lm = sklearn.linear_model.LinearRegression(n_jobs=-1)
+
             X_train, X_test = df.iloc[train_index][features], df.iloc[test_index][features]
             Y_train, Y_test = df.iloc[train_index][[target]], df.iloc[test_index][[target]]
 
-            lm = sklearn.ensemble.RandomForestRegressor(n_jobs=-1, random_state=42)
             lm.fit(X_train, Y_train.values.ravel())
-            score = lm.score(X_test, Y_test)
+            #Y_predicted = np.abs(lm.predict(X_test))
+            Y_predicted = lm.predict(X_test)
+            #score = sklearn.metrics.r2_score(Y_test, Y_predicted)
+            score = smape(Y_test, Y_predicted)
             modelScores.append((score, lm))
         modelScores.sort()
-        modelUsed = modelScores[len(modelScores)//2 +1][1] # Not picking the best model as it could have been best because of the way we split the initial data
-        scoreUsed = modelScores[len(modelScores)//2 +1][0]
+        modelUsed = modelScores[len(modelScores)//2 -1][1] # Not picking the best model as it could have been best because of the way we split the initial data
+        scoreUsed = modelScores[len(modelScores)//2 -1][0]
         print(target, [val[0] for val in modelScores], scoreUsed)
 
         # Use the best model for making predictions
@@ -199,8 +256,10 @@ bejSubDf = doAnalysis2(cityBej=True)
 lonSubDf = doAnalysis2(cityBej=False)
 
 combDf = pd.concat([bejSubDf, lonSubDf])
-dt = datetime.datetime.utcnow().date()
-filename = 'mainSubmission' + "_" + str(dt.day) + "_ " + str(dt.month) + "_" + str(dt.year) + ".csv"
+dt = datetime.datetime.utcnow()
+filename = 'mainSubmission' + "_" + str(dt.date().day) + "_ " + str(dt.date().month) + "_" + str(dt.date().year) + "_" + str(dt.time().hour) + "_" + str(dt.time().minute) + "_" + str(dt.time().second) + ".csv"
+filename = os.path.join("Submissions", filename)
+"""
 combDf.to_csv(filename, index=False, sep=',', columns=['test_id', 'PM2.5', 'PM10', 'O3'])
-
 #submit_preds.submit_preds(filename, 'yashbhandari', 'Sample means', filename=filename)
+"""
