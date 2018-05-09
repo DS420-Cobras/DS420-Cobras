@@ -53,6 +53,48 @@ class MeansFit(sklearn.base.RegressorMixin):
         values = [(self.groupMeans_[station] if station in self.groupMeans_ else self.overallMean_) for station in X['station_id'] ]
         return np.asarray(values)
 
+class smapeFit(sklearn.base.RegressorMixin):
+    "Predict the value based on the smallest smape"
+    def fit(self, X, Y):
+        self.mfit.fit(X, Y)
+        self.groupmapes_ = {}
+        df = X.copy()
+        df['target'] = Y
+        for name, group in df.groupby(['station_id']):
+            mn = np.min(group['target'])
+            mx = np.mean(group['target'])
+            mn = 0 if mn < 0 else mn
+            mx = 0 if mx < 0 else mx
+            if mn >= mx:    continue
+            stp = (mx - mn)/500
+            minError = None
+            minErrorVal = None
+            v = mn
+            count = 0
+            while v < mx:
+                v += stp
+                pVal = [v]*len(group)
+                err = smape(group['target'], pVal)
+                if (minError == None) or (minError > err):
+                    minError = err
+                    minErrorVal = v
+                    count = 0
+                else:
+                    count += 1
+                if count > 20:
+                    break
+            self.groupmapes_[name] = minErrorVal
+        df = None
+        return self
+
+    def predict(self, X):
+        values = [(self.groupmapes_[station] if station in self.groupmapes_ else self.mfit.overallMean_) for station in X['station_id'] ]
+        return np.asarray(values)
+
+    def __init__(self, features=[]):
+        self.mfit = MeansFit(features)
+
+
 def doAnalysis2(cityBej = True):
     "Perform full analysis on the specified city"
     cityName = 'Beijing' if cityBej else "London"
@@ -209,7 +251,8 @@ def doAnalysis2(cityBej = True):
         modelScores = []
         for train_index, test_index in kf.split(df):
             if False:
-                lm = MeansFit(features)
+                #lm = MeansFit(features)
+                lm = smapeFit(features)
             else:
                 lm = sklearn.ensemble.RandomForestRegressor(n_jobs=-1, random_state=42, criterion='mse')
                 #lm = sklearn.linear_model.LinearRegression(n_jobs=-1)
