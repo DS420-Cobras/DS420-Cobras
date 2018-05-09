@@ -5,7 +5,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{852bd744-3c4f-4232-b094-f49b5a6fa507}</ProjectGuid>
     <ProjectHome />
-    <StartupFile>load_weather.py</StartupFile>
+    <StartupFile>main.py</StartupFile>
     <SearchPath />
     <WorkingDirectory>.</WorkingDirectory>
     <OutputPath>.</OutputPath>

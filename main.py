@@ -8,158 +8,259 @@ import time
 import datetime
 import numpy as np
 import sklearn.preprocessing
+import load_weather
+from itertools import product
+import submit_preds
+import os.path
 
 allDf = load_data.getPandasDataframes()
 
-def doAnalysis(cityBej=True):
-    "Name of the city for which we are doing analysis"
+# Copied from discussion forum
+#def calc_smape(labels, forecasts): 
+#    # arrange both indices 
+#    forecasts = forecasts.loc[labels.index].copy() # calc symmetric absolute percentage error (not SMAPE) 
+#    sape_df = ((labels-forecasts).abs()/((labels+forecasts)/2)) # set sape value 0 if actual value and forecast value are both 0 
+#    sape_df[(labels==0)&(forecasts==0)] = 0 # form the dataframe in line, drop nan, and calc SMAPE 
+#    sape_array = sape_df.values.reshape([-1]) 
+#    smape = sape_array[~np.isnan(sape_array)].mean() 
+#    return smape # labels and forecasts have same format 
+
+def smape(actual, predicted):
+    dividend= np.abs(np.array(actual) - np.array(predicted))
+    denominator = np.array(actual) + np.array(predicted)
+    
+    return 2 * np.mean(np.divide(dividend, denominator, out=np.zeros_like(dividend), where=denominator!=0, casting='unsafe'))
+
+class MeansFit(sklearn.base.RegressorMixin):
+    "Predict the mean value"
+    def __init__(self, features=[]):
+        # We are doing cheating here. We are adding station_id in the features list
+        if 'station_id' not in features:
+            features.append('station_id')
+    
+    def fit(self, X, Y):
+        self.groupMeans_ = {}
+        self.overallMean_ = np.mean(Y)
+        df = X.copy()
+        df['target'] = Y
+        for index, row in df.groupby(['station_id']).mean().iterrows():
+            v = row['target']
+            self.groupMeans_[index] = self.overallMean_ if np.isnan(v) else v
+        df = None
+        return self
+
+    def predict(self, X):
+        values = [(self.groupMeans_[station] if station in self.groupMeans_ else self.overallMean_) for station in X['station_id'] ]
+        return np.asarray(values)
+
+def doAnalysis2(cityBej = True):
+    "Perform full analysis on the specified city"
     cityName = 'Beijing' if cityBej else "London"
-
-    # Met data
-    if cityBej:
-        bejMetDf = allDf[(cityName, 'met')]
-        bejMetDf['time'] = pd.to_datetime(bejMetDf['time'], errors='coerce', format='%Y-%m-%d %H:%M:%S')
-        bejMetDf = bejMetDf.rename(columns={'station_id':'met_station'})
-
-    # Grid data
-    bejGrd = allDf[(cityName, 'grid')]
-    bejGrd['time'] = pd.to_datetime(bejGrd['time'], errors='coerce', format='%Y-%m-%d %H:%M:%S')
-    bejGrd = bejGrd.rename(columns={'station_id':'met_station'})
-
     # Air data
     bejDf = allDf[(cityName, 'air')]
-
-    if not cityBej:
-        bejDf.drop(labels=['CO_Concentration', 'O3_Concentration', 'SO2_Concentration'], axis=1, inplace=True)
-
-    # Time related feature engineering
     bejDf['time'] = pd.to_datetime(bejDf['time'], errors='coerce', format='%Y-%m-%d %H:%M:%S')
+    bejDf['test_id'] = "None"
+
+    startDate = np.min(bejDf['time'])
+    now = datetime.datetime.utcnow()
+    endDate = datetime.datetime.strptime(str(now.date().year) + '-' + str(now.date().month) + '-' + str(now.date().day), '%Y-%m-%d') + datetime.timedelta(hours=96)
+    firstPredTime = datetime.datetime.strptime(str(now.date().year) + '-' + str(now.date().month) + '-' + str(now.date().day+1), '%Y-%m-%d')
+    lastPredTime = datetime.datetime.strptime(str(now.date().year) + '-' + str(now.date().month) + '-' + str(now.date().day+3), '%Y-%m-%d')
+
+    # Dataframe useful for final predictions
+    submissionTimes = []
+    subTime = firstPredTime
+    while subTime <lastPredTime:
+        submissionTimes.append(subTime)
+        subTime = subTime + datetime.timedelta(hours=1)
+    subTimeToIdDict = {t:i for i,t in enumerate(submissionTimes)}
+
+    stationlist = ['dongsi_aq', 'tiantan_aq', 'guanyuan_aq', 'wanshouxigong_aq', 'aotizhongxin_aq', 'nongzhanguan_aq', 'wanliu_aq', 'beibuxinqu_aq', 'zhiwuyuan_aq', 'fengtaihuayuan_aq', 'yungang_aq', 'gucheng_aq', 'fangshan_aq',
+               'daxing_aq', 'yizhuang_aq', 'tongzhou_aq', 'shunyi_aq', 'pingchang_aq', 'mentougou_aq', 'pinggu_aq', 'huairou_aq', 'miyun_aq', 'yanqin_aq', 'dingling_aq', 'badaling_aq', 'miyunshuiku_aq',
+               'donggaocun_aq', 'yongledian_aq', 'yufa_aq', 'liulihe_aq', 'qianmen_aq', 'yongdingmennei_aq', 'xizhimenbei_aq', 'nansanhuan_aq', 'dongsihuan_aq']
+    if not cityBej:
+        stationlist = ['CD1', 'BL0', 'GR4', 'MY7', 'HV1', 'GN3', 'GR9', 'LW2', 'GN0', 'KF1', 'CD9','ST5', 'TH4']
+    submissionDf = pd.DataFrame(list(product(stationlist, submissionTimes)), columns=['station_id', 'time'])
+    indxArray = []
+    for i in range(len(submissionDf)):
+        indxArray.append(str(subTimeToIdDict[submissionDf['time'][i]]))
+    submissionDf['test_id'] = submissionDf['station_id'] + '#' + np.asarray(indxArray)
+
+    bejDfCols = list(bejDf)
+    for col in bejDfCols:
+        if col not in list(submissionDf):
+            submissionDf[col] = bejDf.iloc[0][col]
+    # We need ids to debug duplicate rows
+    idStart = np.max(bejDf['id']) + 1
+    for index, row in submissionDf.iterrows():
+        submissionDf.at[index, 'id'] = idStart
+        idStart += 1
+
+    submissionCount = len(submissionDf)
+
+    # Merge the two together for feature engineering part. We will separate them out later on
+    bejDf = pd.concat([bejDf, submissionDf])
+    submissionDf = None
+
+    stationsNeeded = np.unique(bejDf['station_id'])
+
+    weatherDf = load_weather.getWeatherDataRange(startDate, endDate, stationsNeeded, cityName, False)
+    weatherDf['time'] = weatherDf['datetime']
+    assert(len(weatherDf[weatherDf[['station_id', 'time']].duplicated()]) == 0)
+
+    # We are okay with the inner join because of the assert statement immediately afterwards.
+    # What we are saying here is that if the weather data is not available for a certain station at a certain time, then we will not do this analysis at all
+    prev = len(bejDf)
+    newBejDf = bejDf.merge(weatherDf, how='inner', on=['station_id', 'time']) # Created newBejDf to help with debugging
+    assert(len(newBejDf) == prev) # We have weather data corresponding to all of the input data
+    bejDf = newBejDf
+    newBejDf = None
+    assert(len(bejDf[bejDf['test_id'] != "None"]) == submissionCount) # We did not lose a single line for submission file
+
+    bejDf.drop(labels='id', axis=1, inplace=True)
+    bejDf.drop(labels='datetime', axis=1, inplace=True)
+    bejDf.drop(labels='lat', axis=1, inplace=True)
+    bejDf.drop(labels='long', axis=1, inplace=True)
+    
+    # ToDo: Undo. Removed because they have a lot of empty cells. Replace with more meaningful values
+    bejDf.drop(labels='ozone', axis=1, inplace=True)
+    bejDf.drop(labels='precipIntensity', axis=1, inplace=True)
+    bejDf.drop(labels='precipProbability', axis=1, inplace=True)
+    bejDf.drop(labels='pressure', axis=1, inplace=True)
+    bejDf.drop(labels='uvIndex', axis=1, inplace=True)
+    bejDf.drop(labels='windGust', axis=1, inplace=True)
+    bejDf.drop(labels='cloudCover', axis=1, inplace=True)
+    bejDf.drop(labels='precipType', axis=1, inplace=True)
+    bejDf.drop(labels='visibility', axis=1, inplace=True)
+
+    # Make categorical columns for for time based attributes
     bejDf['hour'] = bejDf['time'].dt.hour
     bejDf['day'] = bejDf['time'].dt.day
     bejDf['month'] = bejDf['time'].dt.month
     bejDf['dayofweek'] = bejDf['time'].dt.dayofweek
+    #bejDf['hour'] = bejDf['hour'].apply(lambda x:'hour'+str(x))
+    #bejDf['hour'] = bejDf['hour'].astype('category')
+    #bejDf['day'] = bejDf['day'].apply(lambda x:'day'+str(x))
+    #bejDf['day'] = bejDf['day'].astype('category')
+    #bejDf['month'] = bejDf['month'].apply(lambda x:'month'+str(x))
+    #bejDf['month'] = bejDf['month'].astype('category')
+    #bejDf['dayofweek'] = bejDf['dayofweek'].apply(lambda x:'dayofweek'+str(x))
+    #bejDf['dayofweek'] = bejDf['dayofweek'].astype('category')
 
-    bejDf.drop(labels='id', axis=1, inplace=True)
+    # Business Hours Variable (between 8am and 6pm).
+    #bejDf['businessHours'] = 0
+    #bejDf.loc[(bejDf['hour'] >= 8) & (bejDf['hour']<=18)==0, 'businessHours'] = 1
 
-    # Business Hours Variable (between 8am and 6pm)
-    bejDf['businessHours'] = 0
-    bejDf.loc[(bejDf['hour'] >= 8) & (bejDf['hour']<=18)==0, 'businessHours'] = 1
-
-    # import geospatial data
-    bj_grid_stations = pd.read_csv('viz/' + cityName +'_points.csv')
-    bj_nn = pd.read_excel('viz/' + cityName + '_Neighbors.xlsx')
-    bj_nn = bj_nn.rename(columns={"aq_station": "station_id"})
-
-    # Join the data
-    bejDf = bejDf.merge(bj_nn, on='station_id', how='left')
-    if cityBej:
-        bejWeather = pd.concat([bejMetDf, bejGrd])
+    # Drop the pollution columns that we do not need
+    if not cityBej:
+        bejDf.drop(labels='CO_Concentration', axis=1, inplace=True)
+        bejDf.drop(labels='O3_Concentration', axis=1, inplace=True)
+        bejDf.drop(labels='SO2_Concentration', axis=1, inplace=True)
+        bejDf.drop(labels='NO2_Concentration', axis=1, inplace=True)
     else:
-        bejWeather = pd.concat([bejGrd])
-    bejDf = pd.merge(bejDf, bejWeather,  how='left', on=['met_station','time'])
+        bejDf.drop(labels='NO2_Concentration', axis=1, inplace=True)
+        bejDf.drop(labels='CO_Concentration', axis=1, inplace=True)
+        bejDf.drop(labels='SO2_Concentration', axis=1, inplace=True)
 
-    # Drop columns not useful in analysis
-    bejDf.drop(labels='id', axis=1, inplace=True)
+    # Do not include negative values in the target columns
+    negTargetColumns = ['PM25_Concentration', 'PM10_Concentration', 'O3_Concentration']
+    for col in negTargetColumns:
+        if col in set(bejDf):
+            bejDf.loc[bejDf[col]<0, col] =np.NaN
 
-    # Clean some duplicate categorical variables from weather
-    bejDf['weather'].replace('Cloudy','CLOUDY', inplace=True)
-    bejDf['weather'].replace('Sunny/clear','CLEAR_DAY', inplace=True)
-    bejDf['weather'].replace('Rain','RAIN', inplace=True)
-    bejDf['weather'] = bejDf['weather'].astype('category')
-
-    # Create categorical columns from string columns
-    bejDf['met_station'] = bejDf['met_station'].astype('category')
-    bejDf['station_id'] = bejDf['station_id'].astype('category')
-
-    # Replace some outliers with median values
-    bejDf.loc[bejDf['humidity']== 999999, 'humidity'] = bejDf['humidity'].median()
-    bejDf.loc[bejDf['pressure']== 999999, 'pressure'] = bejDf['pressure'].median()
-    bejDf.loc[bejDf['temperature']== 999999, 'temperature'] = bejDf['temperature'].median()
-
-    # coordinates from weather stations
-    bejDf = pd.merge(bejDf, bj_grid_stations, how='left', on = 'station_id')
-
-    # remove the NANs. not ideal
-    bejDf.drop(['latitude','longitude'], axis=1, inplace=True)
+    # ToDo: Come up with a strategy for handling na values
     bejDf.dropna(inplace=True)
+    assert(len(bejDf[bejDf['test_id'] != "None"]) == submissionCount) # We did not lose a single line of submission file
+    prev = len(bejDf)
 
-    # Normalize the columns
-    scalarCols = [col for col in bejDf.columns if bejDf[col].dtype == np.number]
-    scaler = sklearn.preprocessing.MinMaxScaler(copy = True)
-    bejDf[scalarCols] = scaler.fit_transform(bejDf[scalarCols])
+    bejDf['summary'] = bejDf['summary'].astype('category')
+    bejDf['icon'] = bejDf['icon'].astype('category')
 
     # Handle categorical data
-    bejDf = pd.get_dummies(bejDf, 'dum')
+    # ToDo: Use dummy_na argument of get_dummies and move this method before drop_na
+    test_id = bejDf['test_id']
+    station_id = bejDf['station_id'] # Keeping this alive for means prediction
+    bejDf.drop(labels='test_id', axis=1, inplace=True)
+    bejDf = pd.get_dummies(bejDf, prefix='dum', drop_first=True)
+    bejDf['test_id'] = test_id
+    bejDf['station_id'] = station_id
 
-    # Create test and training set
-    ct = datetime.datetime.utcnow() - datetime.timedelta(hours=48)
-    splitDate = pd.datetime(ct.year,ct.month,ct.day,  ct.hour)
-    trainDf = bejDf[bejDf['time'] < splitDate]
-    testDf = bejDf[bejDf['time'] >= splitDate]
-
-    cur = datetime.datetime.utcnow()
-    current_time = pd.datetime(cur.year,cur.month,cur.day,cur.hour)
-    d = list(testDf.time)
-    date_list = [current_time - datetime.timedelta(hours=x) for x in range(0, 48)]
-    date_list = [pd.to_datetime(i, format='%Y-%m-%d %H:%M:%S') for i in date_list]
-    missingDatesFromTestDf = np.setdiff1d(sorted(date_list),list(set(sorted(d))))
-    print(list(missingDatesFromTestDf))
-
-    # No use of time anymore
+    # What predictions do we get without direct time component?
     bejDf.drop(labels='time', axis=1, inplace=True)
-    #print("Training:", np.unique([str(bejDf[col].dtype) for col in list(bejDf)]))
+    assert(len(bejDf[bejDf['test_id'] != "None"]) == submissionCount) # We did not lose a single line of submission file
 
-    if cityBej:
-        targets = ['PM25_Concentration', 'PM10_Concentration', 'O3_Concentration']
-    else:
+    targets = ['PM25_Concentration', 'PM10_Concentration', 'O3_Concentration']
+    if not cityBej:
         targets = ['PM25_Concentration', 'PM10_Concentration']
-    #targets = ['PM10_Concentration']
-    features = [col for col in list(testDf) if ((col not in targets) and (col != 'time'))]
+    features = [col for col in list(bejDf) if (col not in targets)]
+    features.remove('test_id')
+    features.remove('station_id')
 
-    #print(trainDf[features].head(20))
+    assert((set(bejDf) - set(targets) - set(features)) == {'test_id', 'station_id'})
+    assert(len(bejDf[bejDf['test_id'] != "None"]) == submissionCount) # We did not lose a single line of submission file
 
-    #lm = sklearn.linear_model.LinearRegression(n_jobs=-1)
-    lm = sklearn.ensemble.RandomForestRegressor(n_jobs=-1, random_state=42)
-    lm.fit(trainDf[features], trainDf[targets])
-    print(lm.score(testDf[features], testDf[targets]))
+    # Now, just before we begin modeling, we seperate out the supplied data
+    bejDf.reset_index(drop=True)
+    df = bejDf[bejDf['test_id'] == 'None']
 
-    # Plot the feature importances of the random forest model
-    if False:
-        importances = lm.feature_importances_
-        std = np.std([tree.feature_importances_ for tree in lm.estimators_],
-                 axis=0)
-        indices = np.argsort(importances)[::-1]
+    for target in targets:
+        # K-Fold cross validation
+        kf = sklearn.model_selection.KFold(n_splits=5, shuffle=True, random_state=42)
+        modelScores = []
+        for train_index, test_index in kf.split(df):
+            if False:
+                lm = MeansFit(features)
+            else:
+                lm = sklearn.ensemble.RandomForestRegressor(n_jobs=-1, random_state=42, criterion='mse')
+                #lm = sklearn.linear_model.LinearRegression(n_jobs=-1)
 
-        # Print the feature ranking
-        print("Feature ranking:")
+            X_train, X_test = df.iloc[train_index][features], df.iloc[test_index][features]
+            Y_train, Y_test = df.iloc[train_index][[target]], df.iloc[test_index][[target]]
 
-        for f in range(trainDf[features].shape[1]):
-            print("%d. feature %d (%f)" % (f + 1, indices[f], importances[indices[f]]))
+            lm.fit(X_train, Y_train.values.ravel())
+            Y_predicted = np.abs(lm.predict(X_test))
+            #Y_predicted = lm.predict(X_test)
+            #score = sklearn.metrics.r2_score(Y_test, Y_predicted)
+            score = smape(Y_test, Y_predicted)
+            modelScores.append((score, lm))
+        modelScores.sort()
+        modelUsed = modelScores[len(modelScores)//2 -1][1] # Not picking the best model as it could have been best because of the way we split the initial data
+        scoreUsed = modelScores[len(modelScores)//2 -1][0]
+        print(target, [val[0] for val in modelScores], scoreUsed)
 
-        plt.figure(figsize=(15,10))
-        plt.title("Feature importances")
-        plt.bar(range(trainDf[features].shape[1]), importances[indices],
-               color="r", yerr=std[indices], align="center")
-        plt.xticks(range(trainDf[features].shape[1]), indices)
-        plt.xlim([-1, trainDf[features].shape[1]])
-        plt.show()
+        # Use the best model for making predictions
+        bejDf.loc[bejDf['test_id'] != 'None', target] = np.abs(modelUsed.predict(bejDf.loc[bejDf['test_id'] != 'None', features]))
+    retainColumns = ['test_id']
+    retainColumns += targets
+    for col in list(bejDf):
+        if col in retainColumns:
+            continue
+        bejDf.drop(labels=col, axis=1, inplace=True)
+    renameDict = {'PM25_Concentration':'PM2.5', 'PM10_Concentration':'PM10', 'O3_Concentration':'O3'}
+    for key in renameDict:
+        bejDf.rename(columns={key:renameDict[key]}, inplace=True)
 
-    if False:
-        #lm.fit(trainDf[features], trainDf['PM10_Concentration'])
-        #print(lm.score(testDf[features], testDf['PM10_Concentration']))
-        predictedValues = lm.predict(testDf[features])
-        actualValues = testDf['PM10_Concentration']
-        plot.CreateMultiplePredictedAndActualValuesPlots([predictedValues], [actualValues], 'Random Forest')
+    submissionDf = bejDf[bejDf['test_id'] != 'None']
+    # Final checks
+    if cityBej:
+        assert(len(submissionDf) == 1680)
+        assert(len(list(submissionDf)) == 4)
+    else:
+        assert(len(submissionDf) == 624)
+        assert(len(list(submissionDf)) == 3)
+
+    return submissionDf
 
 
-    if False:
-        plt.scatter(x=bejDf.PM25_Concentration, y=bejDf.PM10_Concentration)
-        plt.xlabel("time", fontsize=14)
-        plt.ylabel("PM10_Concentration", fontsize=14)
-        f = plt.gcf()
-        f.set_figheight(10)
-        f.set_figwidth(15)
-        plt.show()
+bejSubDf = doAnalysis2(cityBej=True)
+lonSubDf = doAnalysis2(cityBej=False)
 
-doAnalysis(cityBej=True)
-#doAnalysis(cityBej=False)
+combDf = pd.concat([bejSubDf, lonSubDf])
+dt = datetime.datetime.utcnow()
+filename = 'mainSubmission' + "_" + str(dt.date().day) + "_ " + str(dt.date().month) + "_" + str(dt.date().year) + "_" + str(dt.time().hour) + "_" + str(dt.time().minute) + "_" + str(dt.time().second) + ".csv"
+filename = os.path.join("Submissions", filename)
+
+"""
+combDf.to_csv(filename, index=False, sep=',', columns=['test_id', 'PM2.5', 'PM10', 'O3'])
+submit_preds.submit_preds(filename, 'yashbhandari', 'Sample means', filename=filename)
+"""
