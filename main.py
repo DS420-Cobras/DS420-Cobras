@@ -238,6 +238,11 @@ def doAnalysis2(cityBej = True):
     features.remove('test_id')
     features.remove('station_id')
 
+    #for target in targets:
+    #    bejDf[target].hist()
+    #    plt.show()
+    #    #print(target, np.min(bejDf[target]), np.max(bejDf[target]))
+
     assert((set(bejDf) - set(targets) - set(features)) == {'test_id', 'station_id'})
     assert(len(bejDf[bejDf['test_id'] != "None"]) == submissionCount) # We did not lose a single line of submission file
 
@@ -245,16 +250,20 @@ def doAnalysis2(cityBej = True):
     bejDf.reset_index(drop=True)
     df = bejDf[bejDf['test_id'] == 'None']
 
+    algoName = None
+
     for target in targets:
         # K-Fold cross validation
         kf = sklearn.model_selection.KFold(n_splits=5, shuffle=True, random_state=42)
         modelScores = []
         for train_index, test_index in kf.split(df):
-            if False:
+            if True:
                 #lm = MeansFit(features)
                 lm = smapeFit(features)
+                algoName = "Smape"
             else:
                 lm = sklearn.ensemble.RandomForestRegressor(n_jobs=-1, random_state=42, criterion='mse')
+                algoName = "RandomForest"
                 #lm = sklearn.linear_model.LinearRegression(n_jobs=-1)
 
             X_train, X_test = df.iloc[train_index][features], df.iloc[test_index][features]
@@ -292,15 +301,15 @@ def doAnalysis2(cityBej = True):
         assert(len(submissionDf) == 624)
         assert(len(list(submissionDf)) == 3)
 
-    return submissionDf
+    return submissionDf, algoName
 
 
-bejSubDf = doAnalysis2(cityBej=True)
-lonSubDf = doAnalysis2(cityBej=False)
+bejSubDf, algoName = doAnalysis2(cityBej=True)
+lonSubDf, algoName = doAnalysis2(cityBej=False)
 
 combDf = pd.concat([bejSubDf, lonSubDf])
 dt = datetime.datetime.utcnow()
-filename = 'mainSubmission' + "_" + str(dt.date().day) + "_ " + str(dt.date().month) + "_" + str(dt.date().year) + "_" + str(dt.time().hour) + "_" + str(dt.time().minute) + "_" + str(dt.time().second) + ".csv"
+filename = algoName + "_" + str(dt.date().day) + "_" + str(dt.date().month) + "_" + str(dt.date().year) + "_" + str(dt.time().hour) + "_" + str(dt.time().minute) + "_" + str(dt.time().second) + ".csv"
 filename = os.path.join("Submissions", filename)
 
 """
