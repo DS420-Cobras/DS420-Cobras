@@ -66,8 +66,8 @@ def getWeatherDataRange(startDate, endDate, stationsNeeded, cityName, shortRun =
         for i in range(5): # Try 5 times
             cached = cached[np.logical_not(cached.duplicated())] # Remove duplicates if they somehow make it into the system
             cached = cached[np.logical_not(cached[['station_id', 'time']].duplicated())]
-            if cached['time'].dtype == np.dtype('O'):
-                cached['time'] = pd.to_datetime(cached['time'], errors='coerce', format='%Y-%m-%d %H:%M:%S')
+            if cached['datetime'].dtype == np.dtype('O'):
+                cached['datetime'] = pd.to_datetime(cached['datetime'], errors='coerce', format='%Y-%m-%d %H:%M:%S')
             if count != prevCount: # Only write to file if we loaded something from internet
                 try:
                     cached.to_csv(os.path.join('viz', cityName + '_weather.csv'), index=False)
