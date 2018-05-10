@@ -250,7 +250,7 @@ def doAnalysis2(cityBej = True):
         kf = sklearn.model_selection.KFold(n_splits=5, shuffle=True, random_state=42)
         modelScores = []
         for train_index, test_index in kf.split(df):
-            if True:
+            if False:
                 #lm = MeansFit(features)
                 lm = smapeFit(features)
             else:
