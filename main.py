@@ -254,10 +254,10 @@ def doAnalysis2(cityBej = True):
 
     for target in targets:
         # K-Fold cross validation
-        kf = sklearn.model_selection.KFold(n_splits=5, shuffle=True, random_state=42)
+        kf = sklearn.model_selection.KFold(n_splits=5, shuffle=False, random_state=42)
         modelScores = []
         for train_index, test_index in kf.split(df):
-            if True:
+            if False:
                 #lm = MeansFit(features)
                 lm = smapeFit(features)
                 algoName = "Smape"
@@ -275,9 +275,11 @@ def doAnalysis2(cityBej = True):
             #score = sklearn.metrics.r2_score(Y_test, Y_predicted)
             score = smape(Y_test, Y_predicted)
             modelScores.append((score, lm))
-        modelScores.sort()
-        modelUsed = modelScores[len(modelScores)//2 -1][1] # Not picking the best model as it could have been best because of the way we split the initial data
-        scoreUsed = modelScores[len(modelScores)//2 -1][0]
+        #modelScores.sort()
+        #modelUsed = modelScores[len(modelScores)//2 -1][1] # Not picking the best model as it could have been best because of the way we split the initial data
+        #scoreUsed = modelScores[len(modelScores)//2 -1][0]
+        modelUsed = modelScores[-1][1] # Pick the model that predicted the last set of values
+        scoreUsed = modelScores[-1][0]
         print(target, [val[0] for val in modelScores], scoreUsed)
 
         # Use the best model for making predictions
@@ -312,7 +314,5 @@ dt = datetime.datetime.utcnow()
 filename = algoName + "_" + str(dt.date().day) + "_" + str(dt.date().month) + "_" + str(dt.date().year) + "_" + str(dt.time().hour) + "_" + str(dt.time().minute) + "_" + str(dt.time().second) + ".csv"
 filename = os.path.join("Submissions", filename)
 
-"""
-combDf.to_csv(filename, index=False, sep=',', columns=['test_id', 'PM2.5', 'PM10', 'O3'])
-submit_preds.submit_preds(filename, 'yashbhandari', 'Sample means', filename=filename)
-"""
+#combDf.to_csv(filename, index=False, sep=',', columns=['test_id', 'PM2.5', 'PM10', 'O3'])
+#submit_preds.submit_preds(filename, 'yashbhandari', 'Sample means', filename=filename)
