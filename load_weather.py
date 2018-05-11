@@ -7,8 +7,8 @@ from calendar import monthrange
 import os.path
 import datetime
 
-api_key = '276d9b4ae748ec5d42ab2ababe8435cc' #apikey obtained from darksky.net 
-#api_key = '999653ec682af395046067847b4f4948' #apikey obtained from darksky.net by Yash
+#api_key = '276d9b4ae748ec5d42ab2ababe8435cc' #apikey obtained from darksky.net 
+api_key = '999653ec682af395046067847b4f4948' #apikey obtained from darksky.net by Yash
 #api_key = '40a186e05ecf67b4dfd467472fdd35bb' #another apikey obtained from darksky.net by Yash
 
 def get_met_data(start_date, numdays, api_key, lat, lng, station_id):
@@ -66,8 +66,8 @@ def getWeatherDataRange(startDate, endDate, stationsNeeded, cityName, shortRun =
         for i in range(5): # Try 5 times
             cached = cached[np.logical_not(cached.duplicated())] # Remove duplicates if they somehow make it into the system
             cached = cached[np.logical_not(cached[['station_id', 'time']].duplicated())]
-            if cached['time'].dtype == np.dtype('O'):
-                cached['time'] = pd.to_datetime(cached['time'], errors='coerce', format='%Y-%m-%d %H:%M:%S')
+            if cached['datetime'].dtype == np.dtype('O'):
+                cached['datetime'] = pd.to_datetime(cached['datetime'], errors='coerce', format='%Y-%m-%d %H:%M:%S')
             if count != prevCount: # Only write to file if we loaded something from internet
                 try:
                     cached.to_csv(os.path.join('viz', cityName + '_weather.csv'), index=False)

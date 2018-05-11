@@ -53,6 +53,48 @@ class MeansFit(sklearn.base.RegressorMixin):
         values = [(self.groupMeans_[station] if station in self.groupMeans_ else self.overallMean_) for station in X['station_id'] ]
         return np.asarray(values)
 
+class smapeFit(sklearn.base.RegressorMixin):
+    "Predict the value based on the smallest smape"
+    def fit(self, X, Y):
+        self.mfit.fit(X, Y)
+        self.groupmapes_ = {}
+        df = X.copy()
+        df['target'] = Y
+        for name, group in df.groupby(['station_id']):
+            mn = np.min(group['target'])
+            mx = np.mean(group['target'])
+            mn = 0 if mn < 0 else mn
+            mx = 0 if mx < 0 else mx
+            if mn >= mx:    continue
+            stp = (mx - mn)/500
+            minError = None
+            minErrorVal = None
+            v = mn
+            count = 0
+            while v < mx:
+                v += stp
+                pVal = [v]*len(group)
+                err = smape(group['target'], pVal)
+                if (minError == None) or (minError > err):
+                    minError = err
+                    minErrorVal = v
+                    count = 0
+                else:
+                    count += 1
+                if count > 20:
+                    break
+            self.groupmapes_[name] = minErrorVal
+        df = None
+        return self
+
+    def predict(self, X):
+        values = [(self.groupmapes_[station] if station in self.groupmapes_ else self.mfit.overallMean_) for station in X['station_id'] ]
+        return np.asarray(values)
+
+    def __init__(self, features=[]):
+        self.mfit = MeansFit(features)
+
+
 def doAnalysis2(cityBej = True):
     "Perform full analysis on the specified city"
     cityName = 'Beijing' if cityBej else "London"
@@ -196,6 +238,11 @@ def doAnalysis2(cityBej = True):
     features.remove('test_id')
     features.remove('station_id')
 
+    #for target in targets:
+    #    bejDf[target].hist()
+    #    plt.show()
+    #    #print(target, np.min(bejDf[target]), np.max(bejDf[target]))
+
     assert((set(bejDf) - set(targets) - set(features)) == {'test_id', 'station_id'})
     assert(len(bejDf[bejDf['test_id'] != "None"]) == submissionCount) # We did not lose a single line of submission file
 
@@ -203,15 +250,20 @@ def doAnalysis2(cityBej = True):
     bejDf.reset_index(drop=True)
     df = bejDf[bejDf['test_id'] == 'None']
 
+    algoName = None
+
     for target in targets:
         # K-Fold cross validation
-        kf = sklearn.model_selection.KFold(n_splits=5, shuffle=True, random_state=42)
+        kf = sklearn.model_selection.KFold(n_splits=5, shuffle=False, random_state=42)
         modelScores = []
         for train_index, test_index in kf.split(df):
             if False:
-                lm = MeansFit(features)
+                #lm = MeansFit(features)
+                lm = smapeFit(features)
+                algoName = "Smape"
             else:
                 lm = sklearn.ensemble.RandomForestRegressor(n_jobs=-1, random_state=42, criterion='mse')
+                algoName = "RandomForest"
                 #lm = sklearn.linear_model.LinearRegression(n_jobs=-1)
 
             X_train, X_test = df.iloc[train_index][features], df.iloc[test_index][features]
@@ -223,9 +275,11 @@ def doAnalysis2(cityBej = True):
             #score = sklearn.metrics.r2_score(Y_test, Y_predicted)
             score = smape(Y_test, Y_predicted)
             modelScores.append((score, lm))
-        modelScores.sort()
-        modelUsed = modelScores[len(modelScores)//2 -1][1] # Not picking the best model as it could have been best because of the way we split the initial data
-        scoreUsed = modelScores[len(modelScores)//2 -1][0]
+        #modelScores.sort()
+        #modelUsed = modelScores[len(modelScores)//2 -1][1] # Not picking the best model as it could have been best because of the way we split the initial data
+        #scoreUsed = modelScores[len(modelScores)//2 -1][0]
+        modelUsed = modelScores[-1][1] # Pick the model that predicted the last set of values
+        scoreUsed = modelScores[-1][0]
         print(target, [val[0] for val in modelScores], scoreUsed)
 
         # Use the best model for making predictions
@@ -249,18 +303,16 @@ def doAnalysis2(cityBej = True):
         assert(len(submissionDf) == 624)
         assert(len(list(submissionDf)) == 3)
 
-    return submissionDf
+    return submissionDf, algoName
 
 
-bejSubDf = doAnalysis2(cityBej=True)
-lonSubDf = doAnalysis2(cityBej=False)
+bejSubDf, algoName = doAnalysis2(cityBej=True)
+lonSubDf, algoName = doAnalysis2(cityBej=False)
 
 combDf = pd.concat([bejSubDf, lonSubDf])
 dt = datetime.datetime.utcnow()
-filename = 'mainSubmission' + "_" + str(dt.date().day) + "_ " + str(dt.date().month) + "_" + str(dt.date().year) + "_" + str(dt.time().hour) + "_" + str(dt.time().minute) + "_" + str(dt.time().second) + ".csv"
+filename = algoName + "_" + str(dt.date().day) + "_" + str(dt.date().month) + "_" + str(dt.date().year) + "_" + str(dt.time().hour) + "_" + str(dt.time().minute) + "_" + str(dt.time().second) + ".csv"
 filename = os.path.join("Submissions", filename)
 
-"""
-combDf.to_csv(filename, index=False, sep=',', columns=['test_id', 'PM2.5', 'PM10', 'O3'])
-submit_preds.submit_preds(filename, 'yashbhandari', 'Sample means', filename=filename)
-"""
+#combDf.to_csv(filename, index=False, sep=',', columns=['test_id', 'PM2.5', 'PM10', 'O3'])
+#submit_preds.submit_preds(filename, 'yashbhandari', 'Sample means', filename=filename)
