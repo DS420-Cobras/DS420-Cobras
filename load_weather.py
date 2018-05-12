@@ -19,6 +19,8 @@ def get_met_data(start_date, numdays, api_key, lat, lng, station_id):
     hist = np.arange(0, len(date_list)).tolist()
     forecast = []
     for n in hist:
+        # If this raises an error, it's probably because you exhausted the allocated calls for the
+        # api key currently in use.  Scroll up to top, switch which key is active, or go get another.
         forecast.append(forecastio.load_forecast(api_key, lat, lng, date_list[n]))
     #jspn object
     met_data = pd.DataFrame()
