@@ -101,3 +101,13 @@ ENV/
 .mypy_cache/
 
 \.DS_Store
+
+safe/
+
+\.vs/cobras/v15/\.suo
+
+viz/stash/
+
+viz/~\$Beijing_Neighbors\.xlsx
+
+viz/Beijing_weather_old\.csv

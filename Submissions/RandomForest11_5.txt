@@ -1,0 +1,79 @@
+https://biendata.com/competition/airquality/bj/2017-01-01-0/2018-05-31-23/2k0d1d8
+data/Beijing/air/bj_airquality_2017-01-01-0_2018-05-31-23.csv
+
+https://biendata.com/competition/meteorology/bj/2017-01-01-0/2018-05-31-23/2k0d1d8
+data/Beijing/met/bj_meteorology_2017-01-01-0_2018-05-31-23.csv
+
+https://biendata.com/competition/meteorology/bj_grid/2017-01-01-0/2018-05-31-23/2k0d1d8
+data/Beijing/grid/bj_grid_2017-01-01-0_2018-05-31-23.csv
+
+https://biendata.com/competition/airquality/ld/2017-01-01-0/2018-05-31-23/2k0d1d8
+data/London/air/ld_airquality_2017-01-01-0_2018-05-31-23.csv
+
+https://biendata.com/competition/meteorology/ld/2017-01-01-0/2018-05-31-23/2k0d1d8
+data/London/met/ld_meteorology_2017-01-01-0_2018-05-31-23.csv
+
+https://biendata.com/competition/meteorology/ld_grid/2017-01-01-0/2018-05-31-23/2k0d1d8
+data/London/grid/ld_grid_2017-01-01-0_2018-05-31-23.csv
+
+aotizhongxin_aq
+badaling_aq
+beibuxinqu_aq
+daxing_aq
+dingling_aq
+donggaocun_aq
+dongsi_aq
+dongsihuan_aq
+fangshan_aq
+fengtaihuayuan_aq
+guanyuan_aq
+gucheng_aq
+huairou_aq
+liulihe_aq
+mentougou_aq
+miyun_aq
+miyunshuiku_aq
+nansanhuan_aq
+nongzhanguan_aq
+pingchang_aq
+pinggu_aq
+qianmen_aq
+shunyi_aq
+tiantan_aq
+tongzhou_aq
+wanliu_aq
+wanshouxigong_aq
+xizhimenbei_aq
+yanqin_aq
+yizhuang_aq
+yongdingmennei_aq
+yongledian_aq
+yufa_aq
+yungang_aq
+zhiwuyuan_aq
+PM25_Concentration [0.91047494685237118, 0.79747464989090622, 0.79408713207058701, 0.87314955568690156, 0.63336611658651121] 0.633366116587
+PM10_Concentration [0.72148359844094312, 0.64701072551265526, 0.70763874809596361, 0.5851303184744916, 0.46091337701614365] 0.460913377016
+O3_Concentration [0.61149892495906266, 0.69200174993379582, 0.82592190222236728, 0.75173924105234124, 0.83619068741689573] 0.836190687417
+BL0
+BX1
+BX9
+CD1
+CD9
+CT2
+CT3
+GN0
+GN3
+GR4
+GR9
+HV1
+KF1
+LW2
+MY7
+RB7
+ST5
+TD5
+TH4
+PM25_Concentration [0.70530535163155061, 0.54710094757462802, 0.68932232482022016, 0.79845416740221042, 0.64580969697566504] 0.645809696976
+PM10_Concentration [0.50742107604513831, 0.49601264614153739, 0.56699592617265326, 0.70807986666684897, 0.50690335681266507] 0.506903356813
+{"success": true}
+Press any key to continue . . .
