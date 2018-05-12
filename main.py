@@ -13,6 +13,11 @@ from itertools import product
 import submit_preds
 import os.path
 
+
+algosPresent = ['Means', 'Smape', 'RandomForest']
+algoToUse = algosPresent[1]
+f = open('log.txt', 'a')
+
 allDf = load_data.getPandasDataframes()
 
 # Copied from discussion forum
@@ -53,7 +58,7 @@ class MeansFit(sklearn.base.RegressorMixin):
         values = [(self.groupMeans_[station] if station in self.groupMeans_ else self.overallMean_) for station in X['station_id'] ]
         return np.asarray(values)
 
-class smapeFit(sklearn.base.RegressorMixin):
+class SmapeFit(sklearn.base.RegressorMixin):
     "Predict the value based on the smallest smape"
     def fit(self, X, Y):
         self.mfit.fit(X, Y)
@@ -254,17 +259,19 @@ def doAnalysis2(cityBej = True):
 
     for target in targets:
         # K-Fold cross validation
-        kf = sklearn.model_selection.KFold(n_splits=5, shuffle=False, random_state=42)
+        shuf = False
+        if target == 'O3_Concentration':
+            shuf = True
+        kf = sklearn.model_selection.KFold(n_splits=5, shuffle=shuf, random_state=42)
         modelScores = []
         for train_index, test_index in kf.split(df):
-            if False:
-                #lm = MeansFit(features)
-                lm = smapeFit(features)
-                algoName = "Smape"
-            else:
+            if algoToUse == 'Means':
+                lm = MeansFit(features)
+            elif algoToUse == 'Smape':
+                lm = SmapeFit(features)
+            elif algoToUse == 'RandomForest':
                 lm = sklearn.ensemble.RandomForestRegressor(n_jobs=-1, random_state=42, criterion='mse')
-                algoName = "RandomForest"
-                #lm = sklearn.linear_model.LinearRegression(n_jobs=-1)
+            algoName = algoToUse
 
             X_train, X_test = df.iloc[train_index][features], df.iloc[test_index][features]
             Y_train, Y_test = df.iloc[train_index][[target]], df.iloc[test_index][[target]]
@@ -281,7 +288,8 @@ def doAnalysis2(cityBej = True):
         modelUsed = modelScores[-1][1] # Pick the model that predicted the last set of values
         scoreUsed = modelScores[-1][0]
         print(target, [val[0] for val in modelScores], scoreUsed)
-
+        f.write(cityName + " " + target + " " + algoName + " " + str(datetime.datetime.utcnow()) + " " + str([val[0] for val in modelScores]) + " " + str(scoreUsed) + '\n')
+        
         # Use the best model for making predictions
         bejDf.loc[bejDf['test_id'] != 'None', target] = np.abs(modelUsed.predict(bejDf.loc[bejDf['test_id'] != 'None', features]))
     retainColumns = ['test_id']
@@ -316,3 +324,5 @@ filename = os.path.join("Submissions", filename)
 
 #combDf.to_csv(filename, index=False, sep=',', columns=['test_id', 'PM2.5', 'PM10', 'O3'])
 #submit_preds.submit_preds(filename, 'yashbhandari', 'Sample means', filename=filename)
+
+f.close()
