@@ -407,6 +407,6 @@ filename = algoName + "_" + str(dt.date().day) + "_" + str(dt.date().month) + "_
 filename = os.path.join("Submissions", filename)
 
 #combDf.to_csv(filename, index=False, sep=',', columns=['test_id', 'PM2.5', 'PM10', 'O3'])
-#submit_preds.submit_preds(filename, 'yashbhandari', 'Sample means', filename=filename)
+#submit_preds.submit_preds(filename, 'yashbhandari', algoName, filename=filename)
 
 f.close()
