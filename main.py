@@ -14,8 +14,8 @@ import submit_preds
 import os.path
 
 
-algosPresent = ['Means', 'Smape', 'RandomForest']
-algoToUse = algosPresent[1]
+algosPresent = ['Means', 'Smape', 'Median', 'LassoStationFit', 'RandomForest']
+algoToUse = algosPresent[0]
 f = open('log.txt', 'a')
 
 allDf = load_data.getPandasDataframes()
@@ -57,6 +57,62 @@ class MeansFit(sklearn.base.RegressorMixin):
     def predict(self, X):
         values = [(self.groupMeans_[station] if station in self.groupMeans_ else self.overallMean_) for station in X['station_id'] ]
         return np.asarray(values)
+
+class MediansFit(sklearn.base.RegressorMixin):
+    "Predict the medians value"
+    def __init__(self, features=[]):
+        # We are doing cheating here. We are adding station_id in the features list
+        if 'station_id' not in features:
+            features.append('station_id')
+    
+    def fit(self, X, Y):
+        self.groupMedian_ = {}
+        self.overallMedian_ = np.median(Y)
+        df = X.copy()
+        df['target'] = Y
+        for index, row in df.groupby(['station_id']).median().iterrows():
+            v = row['target']
+            self.groupMedian_[index] = self.overallMedian_ if np.isnan(v) else v
+        df = None
+        return self
+
+    def predict(self, X):
+        values = [(self.groupMedian_[station] if station in self.groupMedian_ else self.overallMedian_) for station in X['station_id'] ]
+        return np.asarray(values)
+
+class LassoStationFit(sklearn.base.RegressorMixin):
+    "Predict the lasso regrssion"
+    def __init__(self, features=[]):
+        # We are doing cheating here. We are adding station_id in the features list
+        if 'station_id' not in features:
+            features.append('station_id')
+    
+    def fit(self, X, Y):
+        self.groupModl_ = {}
+        self.overallMedian_ = np.median(Y)
+        df = X.copy()
+        df['target'] = Y
+        features = [col for col in list(df) if col not in ('target', 'station_id')]
+        for name, group in df.groupby(['station_id']):
+            modl = sklearn.linear_model.LassoCV(random_state=42, positive=True)
+            modl.fit(group[features], group['target'])
+            self.groupModl_[name] = modl
+        df = None
+        return self
+
+    def predict(self, X):
+        features = [col for col in list(X) if col != 'station_id']
+        values = []
+        for index, row in X.iterrows():
+            station = row['station_id']
+            if station in self.groupModl_:
+                Y = self.groupModl_[station].predict([row[features]])
+                values.append(Y[0])
+            else:
+                values.append(self.overallMedian_)
+        return np.asarray(values)
+
+
 
 class SmapeFit(sklearn.base.RegressorMixin):
     "Predict the value based on the smallest smape"
@@ -272,6 +328,10 @@ def doAnalysis2(cityBej = True):
                 lm = SmapeFit(features)
             elif algoToUse == 'RandomForest':
                 lm = sklearn.ensemble.RandomForestRegressor(n_jobs=-1, random_state=42, criterion='mse')
+            elif algoToUse == 'Median':
+                lm = MediansFit(features)
+            elif algoToUse == 'LassoStationFit':
+                lm = LassoStationFit(features)
             algoName = algoToUse
 
             X_train, X_test = df.iloc[train_index][features], df.iloc[test_index][features]
