@@ -1,0 +1,85 @@
+﻿Public Score,Message,Comment,File
+1.061273771,Submission success,test_submission,submission_preds.csv
+,,,"April 27, 2018, 4:16 p.m."
+0.706310068,Submission success,Sample means,mean.csv
+,,,"April 29, 2018, 11:38 p.m."
+0.364171151,Submission success,Sample means,mean.csv
+,,,"May 3, 2018, 2:12 a.m."
+0.389360282,Submission success,Sample means,mean.csv
+,,,"May 3, 2018, 3:53 a.m."
+0.389466432,Submission success,Sample means,mean.csv
+,,,"May 3, 2018, 4:47 a.m."
+0.444642763,Submission success,Sample means,mean.csv
+,,,"May 4, 2018, 2:42 a.m."
+0.535867864,Submission success,Sample means,mean.csv
+,,,"May 5, 2018, 1:03 a.m."
+0.583892636,Submission success,Sample means,mean.csv
+,,,"May 6, 2018, 4:41 a.m."
+0.556571823,Submission success,Sample means,mainSubmission_6_ 5_2018.csv
+,,,"May 6, 2018, 8:44 p.m."
+0.549124165,Submission success,Sample means,mainSubmission_7_ 5_2018.csv
+,,,"May 7, 2018, 12:16 a.m."
+0.471819262,Submission success,Sample means,mean.csv
+,,,"May 7, 2018, 4:16 a.m."
+0.436162236,Submission success,Sample means,mainSubmission_7_ 5_2018.csv
+,,,"May 7, 2018, 11:41 p.m."
+0.489104022,Submission success,Sample means,Submissions\mainSubmission_8_ 5_2018_3_33_56.csv
+,,,"May 8, 2018, 3:33 a.m."
+0.440486864,Submission success,Sample means,mean.csv
+,,,"May 8, 2018, 4:10 a.m."
+0.457798341,Submission success,Sample means,Submissions\mainSubmission_8_ 5_2018_6_59_14.csv
+,,,"May 8, 2018, 6:59 a.m."
+0.431481176,Submission success,Sample means,mean.csv
+,,,"May 9, 2018, 3:57 a.m."
+0.395635253,Submission success,Sample means,Submissions\mainSubmission_9_ 5_2018_4_57_34.csv
+,,,"May 9, 2018, 4:57 a.m."
+0.393515258,Submission success,Sample means,Submissions\mainSubmission_9_ 5_2018_5_0_34.csv
+,,,"May 9, 2018, 5 a.m."
+0.46161104,Submission success,Sample means,Submissions\RandomForest_10_5_2018_3_24_35.csv
+,,,"May 10, 2018, 3:24 a.m."
+0.388968531,Submission success,Sample means,Submissions\Smape_10_5_2018_3_27_41.csv
+,,,"May 10, 2018, 3:27 a.m."
+0.44647331,Submission success,Sample means,mean.csv
+,,,"May 10, 2018, 4:08 a.m."
+0.409492418,Submission success,Sample means,Submissions\Smape_11_5_2018_3_47_10.csv
+,,,"May 11, 2018, 3:47 a.m."
+0.447390826,Submission success,Sample means,Submissions\RandomForest_11_5_2018_3_48_27.csv
+,,,"May 11, 2018, 3:48 a.m."
+0.446712294,Submission success,Sample means,mean.csv
+,,,"May 11, 2018, 7:15 a.m."
+0.471262099,Submission success,Sample means,mean.csv
+,,,"May 12, 2018, 6:24 a.m."
+0.575946624,Submission success,Sample means,Submissions\RandomForest_12_5_2018_23_6_9.csv
+,,,"May 12, 2018, 11:06 p.m."
+0.442162119,Submission success,Sample means,Submissions\Smape_12_5_2018_23_8_34.csv
+,,,"May 12, 2018, 11:08 p.m."
+0.52085289,Submission success,Sample means,mean.csv
+,,,"May 13, 2018, 11:26 a.m."
+0.472882382,Submission success,Sample means,Submissions\Smape_13_5_2018_11_32_57.csv
+,,,"May 13, 2018, 11:32 a.m."
+0.690874589,Submission success,Sample means,Submissions\RandomForest_13_5_2018_11_35_19.csv
+,,,"May 13, 2018, 11:35 a.m."
+0.449318583,Submission success,Sample means,mean.csv
+,,,"May 14, 2018, 7:09 a.m."
+0.656190346,Submission success,Sample means,Submissions\RandomForest_14_5_2018_7_11_30.csv
+,,,"May 14, 2018, 7:11 a.m."
+0.445564894,Submission success,Sample means,Submissions\Smape_14_5_2018_7_14_31.csv
+,,,"May 14, 2018, 7:14 a.m."
+To be released,Submission success,XGBoost,Submissions/XGBoost_15_5_2018_0_52_46.csv
+,,,"May 15, 2018, 12:52 a.m."
+To be released,Submission success,XGBoost,Submissions/LassoRegression_15_5_2018_1_46_50.csv
+,,,"May 15, 2018, 1:48 a.m."
+To be released,Submission success,Smape,Submissions/Smape_15_5_2018_5_34_28.csv
+,,,"May 15, 2018, 5:35 a.m."
+To be released,Submission success,Sample means,mean.csv
+,,,"May 16, 2018, 6:05 a.m."
+To be released,Submission success,Sample means,Submissions\Smape_16_5_2018_6_9_39.csv
+,,,"May 16, 2018, 6:09 a.m."
+To be released,Submission success,Sample means,Submissions\RandomForest_16_5_2018_6_11_48.csv
+,,,"May 16, 2018, 6:11 a.m."
+To be released,Submission success,Smape,Submissions/Lasso_17_5_2018_0_6_30.csv
+,,,"May 17, 2018, 12:07 a.m."
+To be released,Submission success,Sample means,Submissions\Smape_17_5_2018_5_29_15.csv
+,,,"May 17, 2018, 5:29 a.m."
+To be released,Submission success,fastPred,mean.csv
+,,,"May 17, 2018, 5:34 a.m."
