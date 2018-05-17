@@ -13,7 +13,7 @@ from itertools import product
 import submit_preds
 import os.path
 
-
+# Use Means, Smape, fastPred
 algosPresent = ['Means', 'Smape', 'Median', 'LassoStationFit', 'RandomForest']
 algoToUse = algosPresent[0]
 f = open('log.txt', 'a')
