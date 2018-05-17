@@ -13,9 +13,10 @@ from itertools import product
 import submit_preds
 import os.path
 
-# Use Means, Smape, fastPred
-algosPresent = ['Means', 'Smape', 'Median', 'LassoStationFit', 'RandomForest']
-algoToUse = algosPresent[0]
+# Use MeanMedianEnsamble, Smape, fastPred
+algosPresent = ['Smape', 'MeanMedianEnsamble', 'Means', 'Median', 'LassoStationFit', 'RandomForest']
+algoToUse = algosPresent[1]
+
 f = open('log.txt', 'a')
 
 allDf = load_data.getPandasDataframes()
@@ -35,6 +36,24 @@ def smape(actual, predicted):
     denominator = np.array(actual) + np.array(predicted)
     
     return 2 * np.mean(np.divide(dividend, denominator, out=np.zeros_like(dividend), where=denominator!=0, casting='unsafe'))
+
+class MeanMedianEnsamble(sklearn.base.RegressorMixin):
+    "Ensemble method that predicts average of mean and median"
+    def __init__(self, features=[]):
+        # We are doing cheating here. We are adding station_id in the features list
+        if 'station_id' not in features:
+            features.append('station_id')
+        self.meanModel = MeansFit(features)
+        self.medianModel = MediansFit(features)
+
+    def fit(self, X, Y):
+        self.meanModel.fit(X, Y)
+        self.medianModel.fit(X, Y)
+
+    def predict(self, X):
+        m1 = self.meanModel.predict(X)
+        m2 = self.medianModel.predict(X)
+        return (m1 + m2)/2
 
 class MeansFit(sklearn.base.RegressorMixin):
     "Predict the mean value"
@@ -332,6 +351,8 @@ def doAnalysis2(cityBej = True):
                 lm = MediansFit(features)
             elif algoToUse == 'LassoStationFit':
                 lm = LassoStationFit(features)
+            elif algoToUse == 'MeanMedianEnsamble':
+                lm = MeanMedianEnsamble(features)
             algoName = algoToUse
 
             X_train, X_test = df.iloc[train_index][features], df.iloc[test_index][features]
