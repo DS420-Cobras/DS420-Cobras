@@ -19632,6 +19632,7 @@ id,station_id,time,weather,temperature,pressure,humidity,wind_speed,wind_directi
 3705695,daxing_meo,2018-05-17 03:00:00,Hail,21.7,1000.9,83.0,1.4,44.0
 3705696,fangshan_meo,2018-05-17 03:00:00,Hail,22.2,1000.0,89.0,0.0,999017.0
 3705697,xiayunling_meo,2018-05-17 03:00:00,Sunny/clear,18.7,959.2,89.0,0.8,318.0
+<<<<<<< HEAD
 3707213,shunyi_meo,2018-05-17 04:00:00,Sunny/clear,20.1,1002.4,72.0,2.4,24.0
 3707214,hadian_meo,2018-05-17 04:00:00,Sunny/clear,18.9,1000.6,90.0,1.0,25.0
 3707215,yanqing_meo,2018-05-17 04:00:00,Sunny/clear,15.6,951.2,81.0,3.4,31.0
@@ -19650,3 +19651,5 @@ id,station_id,time,weather,temperature,pressure,humidity,wind_speed,wind_directi
 3707228,daxing_meo,2018-05-17 04:00:00,Hail,21.1,1001.0,74.0,3.6,59.0
 3707229,fangshan_meo,2018-05-17 04:00:00,Hail,21.2,1000.1,83.0,1.7,14.0
 3707230,xiayunling_meo,2018-05-17 04:00:00,Sunny/clear,18.9,959.0,90.0,1.2,322.0
+=======
+>>>>>>> master
