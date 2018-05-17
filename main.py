@@ -13,9 +13,10 @@ from itertools import product
 import submit_preds
 import os.path
 
-
+# Use MeanMedianEnsamble, Smape, fastPred
 algosPresent = ['Smape', 'MeanMedianEnsamble', 'Means', 'Median', 'LassoStationFit', 'RandomForest']
 algoToUse = algosPresent[1]
+
 f = open('log.txt', 'a')
 
 allDf = load_data.getPandasDataframes()
