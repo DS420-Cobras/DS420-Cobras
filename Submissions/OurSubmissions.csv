@@ -65,11 +65,11 @@
 ,,,"May 14, 2018, 7:11 a.m."
 0.445564894,Submission success,Sample means,Submissions\Smape_14_5_2018_7_14_31.csv
 ,,,"May 14, 2018, 7:14 a.m."
-To be released,Submission success,XGBoost,Submissions/XGBoost_15_5_2018_0_52_46.csv
+0.675938862,Submission success,XGBoost,Submissions/XGBoost_15_5_2018_0_52_46.csv
 ,,,"May 15, 2018, 12:52 a.m."
-To be released,Submission success,XGBoost,Submissions/LassoRegression_15_5_2018_1_46_50.csv
+0.657747787,Submission success,XGBoost,Submissions/LassoRegression_15_5_2018_1_46_50.csv
 ,,,"May 15, 2018, 1:48 a.m."
-To be released,Submission success,Smape,Submissions/Smape_15_5_2018_5_34_28.csv
+0.528732637,Submission success,Smape,Submissions/Smape_15_5_2018_5_34_28.csv
 ,,,"May 15, 2018, 5:35 a.m."
 To be released,Submission success,Sample means,mean.csv
 ,,,"May 16, 2018, 6:05 a.m."
@@ -83,3 +83,9 @@ To be released,Submission success,Sample means,Submissions\Smape_17_5_2018_5_29_
 ,,,"May 17, 2018, 5:29 a.m."
 To be released,Submission success,fastPred,mean.csv
 ,,,"May 17, 2018, 5:34 a.m."
+To be released,Submission success,MeanMedianEnsamble,Submissions\MeanMedianEnsamble_18_5_2018_5_39_36.csv
+,,,"May 18, 2018, 5:39 a.m."
+To be released,Submission success,Smape,Submissions\Smape_18_5_2018_5_44_20.csv
+,,,"May 18, 2018, 5:44 a.m."
+To be released,Submission success,fastPred,mean.csv
+,,,"May 18, 2018, 5:45 a.m."
