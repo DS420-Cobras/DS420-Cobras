@@ -31,6 +31,12 @@ class Test_test(unittest.TestCase):
         for key, lengths in expectedLengths.items():
             self.assertLessEqual(lengths[0], allDf[key].shape[0])
             self.assertLessEqual(lengths[1], allDf[key].shape[1])
+    def test_Beijing_Nearest_Neigbor(self):
+        self.assertEqual(2,-1)
+        # BeighingNeigborDf = Read the csv file
+        # grab first row
+        # try to look up the item form the aq colum in master aq list
+
 
 if __name__ == '__main__':
     unittest.main()
