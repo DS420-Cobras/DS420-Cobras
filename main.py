@@ -13,9 +13,10 @@ from itertools import product
 import submit_preds
 import os.path
 
-
-algosPresent = ['Means', 'Smape', 'RandomForest']
+# Use MeanMedianEnsamble, Smape, fastPred
+algosPresent = ['Smape', 'MeanMedianEnsamble', 'Means', 'Median', 'LassoStationFit', 'RandomForest', 'StationHourMedian']
 algoToUse = algosPresent[1]
+
 f = open('log.txt', 'a')
 
 allDf = load_data.getPandasDataframes()
@@ -35,6 +36,24 @@ def smape(actual, predicted):
     denominator = np.array(actual) + np.array(predicted)
     
     return 2 * np.mean(np.divide(dividend, denominator, out=np.zeros_like(dividend), where=denominator!=0, casting='unsafe'))
+
+class MeanMedianEnsamble(sklearn.base.RegressorMixin):
+    "Ensemble method that predicts average of mean and median"
+    def __init__(self, features=[]):
+        # We are doing cheating here. We are adding station_id in the features list
+        if 'station_id' not in features:
+            features.append('station_id')
+        self.meanModel = MeansFit(features)
+        self.medianModel = MediansFit(features)
+
+    def fit(self, X, Y):
+        self.meanModel.fit(X, Y)
+        self.medianModel.fit(X, Y)
+
+    def predict(self, X):
+        m1 = self.meanModel.predict(X)
+        m2 = self.medianModel.predict(X)
+        return (m1 + m2)/2
 
 class MeansFit(sklearn.base.RegressorMixin):
     "Predict the mean value"
@@ -57,6 +76,101 @@ class MeansFit(sklearn.base.RegressorMixin):
     def predict(self, X):
         values = [(self.groupMeans_[station] if station in self.groupMeans_ else self.overallMean_) for station in X['station_id'] ]
         return np.asarray(values)
+
+class MediansFit(sklearn.base.RegressorMixin):
+    "Predict the medians value"
+    def __init__(self, features=[]):
+        # We are doing cheating here. We are adding station_id in the features list
+        if 'station_id' not in features:
+            features.append('station_id')
+    
+    def fit(self, X, Y):
+        self.groupMedian_ = {}
+        self.overallMedian_ = np.median(Y)
+        df = X.copy()
+        df['target'] = Y
+        for index, row in df.groupby(['station_id']).median().iterrows():
+            v = row['target']
+            self.groupMedian_[index] = self.overallMedian_ if np.isnan(v) else v
+        df = None
+        return self
+
+    def predict(self, X):
+        values = [(self.groupMedian_[station] if station in self.groupMedian_ else self.overallMedian_) for station in X['station_id'] ]
+        return np.asarray(values)
+
+class StationHourMedian(sklearn.base.RegressorMixin):
+    "Predict the medians value"
+    def __init__(self, features=[]):
+        # We are doing cheating here. We are adding station_id in the features list
+        if 'station_id' not in features:
+            features.append('station_id')
+        if 'hour2' not in features:
+            features.append('hour2')
+        self.medFit = MediansFit(features)
+    
+    def fit(self, X, Y):
+        self.medFit.fit(X, Y)
+        self.groupMedian_ = {}
+        df = X.copy()
+        df['target'] = Y
+        for index, row in df.groupby(['station_id', 'hour2']).median().iterrows():
+            v = row['target']
+            if not np.isnan(v):
+                self.groupMedian_[index] = v
+        df = None
+        return self
+
+    def predict(self, X):
+        #features = [col for col in list(X) if col != 'station_id']
+        values = []
+        for index, row in X.iterrows():
+            station = row['station_id']
+            hour2 = row['hour2']
+            if (station, hour2) in self.groupMedian_:
+                Y = self.groupMedian_[(station, hour2)]
+                values.append(Y)
+            elif station in self.medFit.groupMedian_:
+                values.append(self.medFit.groupMedian_[station])
+            else:
+                values.append(self.medFit.overallMedian_)
+                #Y = self.medFit.predict([row])
+                #values.append(Y[0])
+        return np.asarray(values)
+
+class LassoStationFit(sklearn.base.RegressorMixin):
+    "Predict the lasso regrssion"
+    def __init__(self, features=[]):
+        # We are doing cheating here. We are adding station_id in the features list
+        if 'station_id' not in features:
+            features.append('station_id')
+    
+    def fit(self, X, Y):
+        self.groupModl_ = {}
+        self.overallMedian_ = np.median(Y)
+        df = X.copy()
+        df['target'] = Y
+        features = [col for col in list(df) if col not in ('target', 'station_id')]
+        for name, group in df.groupby(['station_id']):
+            modl = sklearn.linear_model.LassoCV(random_state=42, positive=True)
+            modl.fit(group[features], group['target'])
+            self.groupModl_[name] = modl
+        df = None
+        return self
+
+    def predict(self, X):
+        features = [col for col in list(X) if col != 'station_id']
+        values = []
+        for index, row in X.iterrows():
+            station = row['station_id']
+            if station in self.groupModl_:
+                Y = self.groupModl_[station].predict([row[features]])
+                values.append(Y[0])
+            else:
+                values.append(self.overallMedian_)
+        return np.asarray(values)
+
+
 
 class SmapeFit(sklearn.base.RegressorMixin):
     "Predict the value based on the smallest smape"
@@ -185,14 +299,17 @@ def doAnalysis2(cityBej = True):
     bejDf['day'] = bejDf['time'].dt.day
     bejDf['month'] = bejDf['time'].dt.month
     bejDf['dayofweek'] = bejDf['time'].dt.dayofweek
-    #bejDf['hour'] = bejDf['hour'].apply(lambda x:'hour'+str(x))
-    #bejDf['hour'] = bejDf['hour'].astype('category')
-    #bejDf['day'] = bejDf['day'].apply(lambda x:'day'+str(x))
-    #bejDf['day'] = bejDf['day'].astype('category')
-    #bejDf['month'] = bejDf['month'].apply(lambda x:'month'+str(x))
-    #bejDf['month'] = bejDf['month'].astype('category')
-    #bejDf['dayofweek'] = bejDf['dayofweek'].apply(lambda x:'dayofweek'+str(x))
-    #bejDf['dayofweek'] = bejDf['dayofweek'].astype('category')
+    bejDf['hour'] = bejDf['hour'].apply(lambda x:'hour'+str(x))
+    bejDf['hour'] = bejDf['hour'].astype('category')
+    bejDf['day'] = bejDf['day'].apply(lambda x:'day'+str(x))
+    bejDf['day'] = bejDf['day'].astype('category')
+    bejDf['month'] = bejDf['month'].apply(lambda x:'month'+str(x))
+    bejDf['month'] = bejDf['month'].astype('category')
+    bejDf['dayofweek'] = bejDf['dayofweek'].apply(lambda x:'dayofweek'+str(x))
+    bejDf['dayofweek'] = bejDf['dayofweek'].astype('category')
+
+    # Extra column for a median model
+    bejDf['hour2'] = bejDf['time'].dt.hour
 
     # Business Hours Variable (between 8am and 6pm).
     #bejDf['businessHours'] = 0
@@ -242,13 +359,14 @@ def doAnalysis2(cityBej = True):
     features = [col for col in list(bejDf) if (col not in targets)]
     features.remove('test_id')
     features.remove('station_id')
+    features.remove('hour2')
 
     #for target in targets:
     #    bejDf[target].hist()
     #    plt.show()
     #    #print(target, np.min(bejDf[target]), np.max(bejDf[target]))
 
-    assert((set(bejDf) - set(targets) - set(features)) == {'test_id', 'station_id'})
+    assert((set(bejDf) - set(targets) - set(features)) == {'test_id', 'station_id', 'hour2'})
     assert(len(bejDf[bejDf['test_id'] != "None"]) == submissionCount) # We did not lose a single line of submission file
 
     # Now, just before we begin modeling, we seperate out the supplied data
@@ -259,9 +377,10 @@ def doAnalysis2(cityBej = True):
 
     for target in targets:
         # K-Fold cross validation
-        shuf = False
-        if target == 'O3_Concentration':
-            shuf = True
+        #shuf = False
+        #if target == 'O3_Concentration':
+        #    shuf = True
+        shuf = True
         kf = sklearn.model_selection.KFold(n_splits=5, shuffle=shuf, random_state=42)
         modelScores = []
         for train_index, test_index in kf.split(df):
@@ -271,6 +390,14 @@ def doAnalysis2(cityBej = True):
                 lm = SmapeFit(features)
             elif algoToUse == 'RandomForest':
                 lm = sklearn.ensemble.RandomForestRegressor(n_jobs=-1, random_state=42, criterion='mse')
+            elif algoToUse == 'Median':
+                lm = MediansFit(features)
+            elif algoToUse == 'LassoStationFit':
+                lm = LassoStationFit(features)
+            elif algoToUse == 'MeanMedianEnsamble':
+                lm = MeanMedianEnsamble(features)
+            elif algoToUse == 'StationHourMedian':
+                lm = StationHourMedian(features)
             algoName = algoToUse
 
             X_train, X_test = df.iloc[train_index][features], df.iloc[test_index][features]
@@ -282,16 +409,20 @@ def doAnalysis2(cityBej = True):
             #score = sklearn.metrics.r2_score(Y_test, Y_predicted)
             score = smape(Y_test, Y_predicted)
             modelScores.append((score, lm))
-        #modelScores.sort()
-        #modelUsed = modelScores[len(modelScores)//2 -1][1] # Not picking the best model as it could have been best because of the way we split the initial data
-        #scoreUsed = modelScores[len(modelScores)//2 -1][0]
-        modelUsed = modelScores[-1][1] # Pick the model that predicted the last set of values
-        scoreUsed = modelScores[-1][0]
+        if shuf:
+            modelScores.sort()
+            modelUsed = modelScores[0][1]
+            scoreUsed = modelScores[0][0]
+        else:
+            modelUsed = modelScores[-1][1] # Pick the model that predicted the last set of values
+            scoreUsed = modelScores[-1][0]
         print(target, [val[0] for val in modelScores], scoreUsed)
         f.write(cityName + " " + target + " " + algoName + " " + str(datetime.datetime.utcnow()) + " " + str([val[0] for val in modelScores]) + " " + str(scoreUsed) + '\n')
         
         # Use the best model for making predictions
         bejDf.loc[bejDf['test_id'] != 'None', target] = np.abs(modelUsed.predict(bejDf.loc[bejDf['test_id'] != 'None', features]))
+        if 'hour2' in features:
+            features.remove('hour2')
     retainColumns = ['test_id']
     retainColumns += targets
     for col in list(bejDf):
@@ -323,6 +454,6 @@ filename = algoName + "_" + str(dt.date().day) + "_" + str(dt.date().month) + "_
 filename = os.path.join("Submissions", filename)
 
 #combDf.to_csv(filename, index=False, sep=',', columns=['test_id', 'PM2.5', 'PM10', 'O3'])
-#submit_preds.submit_preds(filename, 'yashbhandari', 'Sample means', filename=filename)
+#submit_preds.submit_preds(filename, 'yashbhandari', algoName, filename=filename)
 
 f.close()
