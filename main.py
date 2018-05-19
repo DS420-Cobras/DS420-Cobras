@@ -15,7 +15,7 @@ import os.path
 
 # Use MeanMedianEnsamble, Smape, fastPred
 algosPresent = ['Smape', 'MeanMedianEnsamble', 'Means', 'Median', 'LassoStationFit', 'RandomForest', 'StationHourMedian']
-algoToUse = algosPresent[1]
+algoToUse = algosPresent[2]
 
 f = open('log.txt', 'a')
 
