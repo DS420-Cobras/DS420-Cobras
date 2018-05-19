@@ -71,11 +71,11 @@
 ,,,"May 15, 2018, 1:48 a.m."
 0.528732637,Submission success,Smape,Submissions/Smape_15_5_2018_5_34_28.csv
 ,,,"May 15, 2018, 5:35 a.m."
-To be released,Submission success,Sample means,mean.csv
+0.598998701,Submission success,Sample means,mean.csv
 ,,,"May 16, 2018, 6:05 a.m."
-To be released,Submission success,Sample means,Submissions\Smape_16_5_2018_6_9_39.csv
+0.489919867,Submission success,Sample means,Submissions\Smape_16_5_2018_6_9_39.csv
 ,,,"May 16, 2018, 6:09 a.m."
-To be released,Submission success,Sample means,Submissions\RandomForest_16_5_2018_6_11_48.csv
+0.806241108,Submission success,Sample means,Submissions\RandomForest_16_5_2018_6_11_48.csv
 ,,,"May 16, 2018, 6:11 a.m."
 To be released,Submission success,Smape,Submissions/Lasso_17_5_2018_0_6_30.csv
 ,,,"May 17, 2018, 12:07 a.m."
@@ -89,3 +89,9 @@ To be released,Submission success,Smape,Submissions\Smape_18_5_2018_5_44_20.csv
 ,,,"May 18, 2018, 5:44 a.m."
 To be released,Submission success,fastPred,mean.csv
 ,,,"May 18, 2018, 5:45 a.m."
+To be released,Submission success,Smape,Submissions\Smape_19_5_2018_3_41_43.csv
+,,,"May 19, 2018, 3:41 a.m."
+To be released,Submission success,MeanMedianEnsamble,Submissions\MeanMedianEnsamble_19_5_2018_3_44_8.csv
+,,,"May 19, 2018, 3:44 a.m."
+To be released,Submission success,fastPred,mean.csv
+,,,"May 19, 2018, 3:45 a.m."
