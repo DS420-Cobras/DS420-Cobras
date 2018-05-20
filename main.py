@@ -15,7 +15,7 @@ import os.path
 
 # Use MeanMedianEnsamble, Smape, fastPred
 algosPresent = ['Smape', 'MeanMedianEnsamble', 'Means', 'Median', 'LassoStationFit', 'RandomForest', 'StationHourMedian']
-algoToUse = algosPresent[2]
+algoToUse = algosPresent[6] #max of 6
 
 f = open('log.txt', 'a')
 
@@ -279,8 +279,9 @@ def doAnalysis2(cityBej = True):
     assert(len(bejDf[bejDf['test_id'] != "None"]) == submissionCount) # We did not lose a single line for submission file
 
     #### LEO ###
-    bejDf.to_csv(cityName + "Df.csv", index=False, sep=',')
+    # bejDf.to_csv(cityName + "Df.csv", index=False, sep=',')
     ### LEO ###
+
     bejDf.drop(labels='id', axis=1, inplace=True)
     bejDf.drop(labels='datetime', axis=1, inplace=True)
     bejDf.drop(labels='lat', axis=1, inplace=True)
