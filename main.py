@@ -15,7 +15,7 @@ import os.path
 
 # Use MeanMedianEnsamble, Smape, fastPred
 algosPresent = ['Smape', 'MeanMedianEnsamble', 'Means', 'Median', 'LassoStationFit', 'RandomForest', 'StationHourMedian']
-algoToUse = algosPresent[6] #max of 6
+algoToUse = algosPresent[0] #max of 6
 
 f = open('log.txt', 'a')
 
@@ -476,6 +476,10 @@ def doAnalysis3Beijing():
     stationlist = ['dongsi_aq', 'tiantan_aq', 'guanyuan_aq', 'wanshouxigong_aq', 'aotizhongxin_aq', 'nongzhanguan_aq', 'wanliu_aq', 'beibuxinqu_aq', 'zhiwuyuan_aq', 'fengtaihuayuan_aq', 'yungang_aq', 'gucheng_aq', 'fangshan_aq',
                'daxing_aq', 'yizhuang_aq', 'tongzhou_aq', 'shunyi_aq', 'pingchang_aq', 'mentougou_aq', 'pinggu_aq', 'huairou_aq', 'miyun_aq', 'yanqin_aq', 'dingling_aq', 'badaling_aq', 'miyunshuiku_aq',
                'donggaocun_aq', 'yongledian_aq', 'yufa_aq', 'liulihe_aq', 'qianmen_aq', 'yongdingmennei_aq', 'xizhimenbei_aq', 'nansanhuan_aq', 'dongsihuan_aq']
+  
+#    stationlist = ['dongsi_aq', 'tiantan_aq', 'guanyuan_aq', 'wanshouxigong_aq', 'aotizhongxin_aq', 'nongzhanguan_aq', 'wanliu_aq', 'beibuxinqu_aq', 'fengtaihuayuan_aq', 'yungang_aq', 'gucheng_aq', 'fangshan_aq',
+#               'daxing_aq', 'yizhuang_aq', 'tongzhou_aq', 'shunyi_aq', 'pingchang_aq', 'mentougou_aq', 'pinggu_aq', 'huairou_aq', 'miyun_aq', 'yanqin_aq', 'dingling_aq', 'badaling_aq', 'miyunshuiku_aq',
+#               'donggaocun_aq', 'yongledian_aq', 'yufa_aq', 'liulihe_aq', 'qianmen_aq', 'yongdingmennei_aq', 'xizhimenbei_aq', 'nansanhuan_aq', 'dongsihuan_aq']
 
     submissionDf = pd.DataFrame(list(product(stationlist, submissionTimes)), columns=['station_id', 'time'])
 
@@ -525,15 +529,15 @@ def doAnalysis3Beijing():
     bejDf.drop(labels='long', axis=1, inplace=True)
     
     # ToDo: Undo. Removed because they have a lot of empty cells. Replace with more meaningful values
-    bejDf.drop(labels='ozone', axis=1, inplace=True)
-    bejDf.drop(labels='precipIntensity', axis=1, inplace=True)
-    bejDf.drop(labels='precipProbability', axis=1, inplace=True)
+    # bejDf.drop(labels='ozone', axis=1, inplace=True)
+    # bejDf.drop(labels='precipIntensity', axis=1, inplace=True)
+    # bejDf.drop(labels='precipProbability', axis=1, inplace=True)
     bejDf.drop(labels='pressure', axis=1, inplace=True)
-    bejDf.drop(labels='uvIndex', axis=1, inplace=True)
-    bejDf.drop(labels='windGust', axis=1, inplace=True)
+    # bejDf.drop(labels='uvIndex', axis=1, inplace=True)
+    # bejDf.drop(labels='windGust', axis=1, inplace=True)
     bejDf.drop(labels='cloudCover', axis=1, inplace=True)
     bejDf.drop(labels='precipType', axis=1, inplace=True)
-    bejDf.drop(labels='visibility', axis=1, inplace=True)
+    # bejDf.drop(labels='visibility', axis=1, inplace=True)
 
     # Make categorical columns for for time based attributes
     bejDf['hour'] = bejDf['time'].dt.hour
@@ -556,10 +560,14 @@ def doAnalysis3Beijing():
     #bejDf['businessHours'] = 0
     #bejDf.loc[(bejDf['hour'] >= 8) & (bejDf['hour']<=18)==0, 'businessHours'] = 1
 
+    # from https://stackoverflow.com/questions/13851535/how-to-delete-rows-from-a-pandas-dataframe-based-on-a-conditional-expression?utm_medium=organic&utm_source=google_rich_qa&utm_campaign=google_rich_qa
+    # df.drop(df[df.score < 50].index, inplace=True)
+    # bejDf.drop(bejDf[bejDf.station_id != 'zhiwuyuan_aq'].index, inplace=True)
+
     # Drop the pollution columns that we do not need
-    bejDf.drop(labels='NO2_Concentration', axis=1, inplace=True)
-    bejDf.drop(labels='CO_Concentration', axis=1, inplace=True)
-    bejDf.drop(labels='SO2_Concentration', axis=1, inplace=True)
+    # bejDf.drop(labels='NO2_Concentration', axis=1, inplace=True)
+    # bejDf.drop(labels='CO_Concentration', axis=1, inplace=True)
+    # bejDf.drop(labels='SO2_Concentration', axis=1, inplace=True)
 
     # Do not include negative values in the target columns
     negTargetColumns = ['PM25_Concentration', 'PM10_Concentration', 'O3_Concentration']
@@ -746,9 +754,9 @@ def doAnalysis3London():
     lonDf.drop(labels='long', axis=1, inplace=True)
     
     # ToDo: Undo. Removed because they have a lot of empty cells. Replace with more meaningful values
-    lonDf.drop(labels='ozone', axis=1, inplace=True)
-    lonDf.drop(labels='precipIntensity', axis=1, inplace=True)
-    lonDf.drop(labels='precipProbability', axis=1, inplace=True)
+    # lonDf.drop(labels='ozone', axis=1, inplace=True)
+    # lonDf.drop(labels='precipIntensity', axis=1, inplace=True)
+    # lonDf.drop(labels='precipProbability', axis=1, inplace=True)
     lonDf.drop(labels='pressure', axis=1, inplace=True)
     lonDf.drop(labels='uvIndex', axis=1, inplace=True)
     lonDf.drop(labels='windGust', axis=1, inplace=True)
@@ -781,7 +789,8 @@ def doAnalysis3London():
     lonDf.drop(labels='CO_Concentration', axis=1, inplace=True)
     lonDf.drop(labels='O3_Concentration', axis=1, inplace=True)
     lonDf.drop(labels='SO2_Concentration', axis=1, inplace=True)
-    lonDf.drop(labels='NO2_Concentration', axis=1, inplace=True)
+    
+    # lonDf.drop(labels='NO2_Concentration', axis=1, inplace=True)
 
 
     # Do not include negative values in the target columns

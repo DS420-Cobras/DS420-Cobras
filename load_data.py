@@ -110,10 +110,12 @@ def getPandasDataframes(argv = ['-c', 'Both', '-d', 'all', '-f', '2017-01-01-0',
     fileDict = main(argv)
     return {key:pd.read_csv(value) for (key, value) in fileDict.items()}
 
+# 2018-04-23-10
 def getBeijingDataframes(argv = ['-c', 'Beijing', '-d', 'all', '-f', '2017-01-01-0', '-t', '2018-05-31-23']):
     fileDict = main(argv)
     return {key:pd.read_csv(value) for (key, value) in fileDict.items()}
 
+# 2018-04-22-21
 def getLondonDataframes(argv = ['-c', 'London', '-d', 'all', '-f', '2017-01-01-0', '-t', '2018-05-31-23']):
     fileDict = main(argv)
     return {key:pd.read_csv(value) for (key, value) in fileDict.items()}
