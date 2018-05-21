@@ -40,4 +40,4 @@ combDf = pd.concat([bejSubDf[columns], lonSubDf[columns]])
 combDf.to_csv("submission_preds.csv", index=False, sep=',')
 
 
-submit_preds.submit_preds('submission_preds.csv', 'leosalemann', 'fastPred', filename='mean.csv')
+# submit_preds.submit_preds('submission_preds.csv', 'leosalemann', 'fastPred', filename='mean.csv')
