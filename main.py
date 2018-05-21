@@ -15,7 +15,7 @@ import os.path
 
 # Use MeanMedianEnsamble, Smape, fastPred
 algosPresent = ['Smape', 'MeanMedianEnsamble', 'Means', 'Median', 'LassoStationFit', 'RandomForest', 'StationHourMedian']
-algoToUse = algosPresent[2] #max of 6
+algoToUse = algosPresent[3] #max of 6
 
 f = open('log.txt', 'a')
 
@@ -525,15 +525,15 @@ def doAnalysis3Beijing():
     bejDf.drop(labels='long', axis=1, inplace=True)
     
     # ToDo: Undo. Removed because they have a lot of empty cells. Replace with more meaningful values
-    bejDf.drop(labels='ozone', axis=1, inplace=True)
-    bejDf.drop(labels='precipIntensity', axis=1, inplace=True)
-    bejDf.drop(labels='precipProbability', axis=1, inplace=True)
-    bejDf.drop(labels='pressure', axis=1, inplace=True)
-    bejDf.drop(labels='uvIndex', axis=1, inplace=True)
-    bejDf.drop(labels='windGust', axis=1, inplace=True)
+    # bejDf.drop(labels='ozone', axis=1, inplace=True)
+    # bejDf.drop(labels='precipIntensity', axis=1, inplace=True) # clean /non-null data starts on 4/23/18 10am
+    # bejDf.drop(labels='precipProbability', axis=1, inplace=True) # clean /non-null data starts on 4/23/18 10am
+    # bejDf.drop(labels='pressure', axis=1, inplace=True) # clean /non-null data starts on 4/23/18 10am
+    bejDf.drop(labels='uvIndex', axis=1, inplace=True)    # need to change some nulls to zero after 4/23/18 10am
+    # bejDf.drop(labels='windGust', axis=1, inplace=True) # clean /non-null data starts on 4/23/18 10am
     bejDf.drop(labels='cloudCover', axis=1, inplace=True)
     bejDf.drop(labels='precipType', axis=1, inplace=True)
-    bejDf.drop(labels='visibility', axis=1, inplace=True)
+    bejDf.drop(labels='visibility', axis=1, inplace=True) # way too many nulls
 
     # Make categorical columns for for time based attributes
     bejDf['hour'] = bejDf['time'].dt.hour
@@ -746,12 +746,12 @@ def doAnalysis3London():
     lonDf.drop(labels='long', axis=1, inplace=True)
     
     # ToDo: Undo. Removed because they have a lot of empty cells. Replace with more meaningful values
-    lonDf.drop(labels='ozone', axis=1, inplace=True)
-    lonDf.drop(labels='precipIntensity', axis=1, inplace=True)
-    lonDf.drop(labels='precipProbability', axis=1, inplace=True)
+    # lonDf.drop(labels='ozone', axis=1, inplace=True)           # clean after 4/22/18 9pm
+    # lonDf.drop(labels='precipIntensity', axis=1, inplace=True) # clean after 4/22/18 9pm
+    # lonDf.drop(labels='precipProbability', axis=1, inplace=True) # clean after 4/22/18 9pm
     lonDf.drop(labels='pressure', axis=1, inplace=True)
-    lonDf.drop(labels='uvIndex', axis=1, inplace=True)
-    lonDf.drop(labels='windGust', axis=1, inplace=True)
+    lonDf.drop(labels='uvIndex', axis=1, inplace=True)  # has only one nan after 4/22/18 9pm, need to set to zero
+    lonDf.drop(labels='windGust', axis=1, inplace=True) # has only one nan after 4/22/18 9pm, need to set to zero
     lonDf.drop(labels='cloudCover', axis=1, inplace=True)
     lonDf.drop(labels='precipType', axis=1, inplace=True)
     lonDf.drop(labels='visibility', axis=1, inplace=True)
@@ -890,7 +890,7 @@ def doAnalysis3London():
     for key in renameDict:
         lonDf.rename(columns={key:renameDict[key]}, inplace=True)
 
-    submissionDf = lonDf[lonDf['test_id'] != 'None']\
+    submissionDf = lonDf[lonDf['test_id'] != 'None']
     # Final checks
     assert(len(submissionDf) == 624)
     assert(len(list(submissionDf)) == 3)
@@ -907,7 +907,7 @@ dt = datetime.datetime.utcnow()
 filename = algoName + "_" + str(dt.date().day) + "_" + str(dt.date().month) + "_" + str(dt.date().year) + "_" + str(dt.time().hour) + "_" + str(dt.time().minute) + "_" + str(dt.time().second) + ".csv"
 filename = os.path.join("Submissions", filename)
 
-#combDf.to_csv(filename, index=False, sep=',', columns=['test_id', 'PM2.5', 'PM10', 'O3'])
-#submit_preds.submit_preds(filename, 'yashbhandari', algoName, filename=filename)
+combDf.to_csv(filename, index=False, sep=',', columns=['test_id', 'PM2.5', 'PM10', 'O3'])
+submit_preds.submit_preds(filename, 'leosalemann', algoName, filename=filename)
 
 f.close()
