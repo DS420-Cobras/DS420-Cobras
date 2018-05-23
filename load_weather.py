@@ -8,8 +8,8 @@ import os.path
 import datetime
 
 #api_key = '276d9b4ae748ec5d42ab2ababe8435cc' #apikey obtained from darksky.net 
-api_key = '999653ec682af395046067847b4f4948' #apikey obtained from darksky.net by Yash
-#api_key = '40a186e05ecf67b4dfd467472fdd35bb' #another apikey obtained from darksky.net by Yash
+#api_key = '999653ec682af395046067847b4f4948' #apikey obtained from darksky.net by Yash
+api_key = '40a186e05ecf67b4dfd467472fdd35bb' #another apikey obtained from darksky.net by Yash
 
 def get_met_data(start_date, numdays, api_key, lat, lng, station_id):
     "Function to get weather"
