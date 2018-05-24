@@ -1,0 +1,61 @@
+﻿City,ColID,Feature,unique values, null values,null fraction,Sentinel Value,Behavior,heuristic
+Beijing,21, precipType,2,18967,0.461596,n/a,n/a,replace null values with the word 'none' (no quotes)
+Beijing,26, visibility,933,18384,0.447408,-1.000000,No good data after May 6 11pm,for each station: replace null with averge of prior and subsetuqent non-null value for same station
+Beijing,25, uvIndex,12,17647,0.429472,-1.000000,No good data until  Apr 22 8pm,for each station: replace null with averge of prior and subsetuqent non-null value for same station
+Beijing,28, windGust,1332,17647,0.429472,-1.000000,No good data until  Apr 22 8pm,(after Apr 22 8pm) for each station: replace null with averge of prior and subsetuqent non-null value for same station
+Beijing,18, ozone,9084,17262,0.420102,-100.000000,No good data until  Apr 23 10am,Everythings fine from  Apr 23 10am onward
+Beijing,19, precipIntensity,629,17262,0.420102,-1.000000,No good data until  Apr 23 10am,Everythings fine from  Apr 23 10am onward
+Beijing,20, precipProbability,61,17262,0.420102,-1.000000,No good data until  Apr 23 10am,Everythings fine from  Apr 23 10am onward
+Beijing,22, pressure,3010,11130,0.270869,-100.000000,No good data until  Apr 23 10am,Everythings fine from  Apr 23 10am onward
+Beijing,11, cloudCover,101,8153,0.198418,-1.000000,,If summary field says Foggy then set cloudCover  to 1.0; otherwise set to 0.0
+Beijing,3, PM10_Concentration,646,8063,0.196228,-100.000000,zhiwuyuan_aq station should be dropppe; all others have good data for whole timespan; just some scattered holes,for each station: replace null with averge of prior and subsetuqent non-null value for same station
+Beijing,4, PM25_Concentration,329,2183,0.053127,-100.000000,zhiwuyuan_aq station should be dropppe; all others have good data for whole timespan; just some scattered holes,for each station: replace null with averge of prior and subsetuqent non-null value for same station
+Beijing,2, O3_Concentration,319,1934,0.047067,-100.000000,zhiwuyuan_aq station should be dropppe; all others have good data for whole timespan; just some scattered holes,for each station: replace null with averge of prior and subsetuqent non-null value for same station
+Beijing,5, SO2_Concentration,79,1758,0.042784,-100.000000,zhiwuyuan_aq station should be dropppe; all others have good data for whole timespan; just some scattered holes,for each station: replace null with averge of prior and subsetuqent non-null value for same station
+Beijing,1, NO2_Concentration,194,1734,0.042200,-100.000000,zhiwuyuan_aq station should be dropppe; all others have good data for whole timespan; just some scattered holes,for each station: replace null with averge of prior and subsetuqent non-null value for same station
+Beijing,0, CO_Concentration,43,1713,0.041689,-1.000000,zhiwuyuan_aq station should be dropppe; all others have good data for whole timespan; just some scattered holes,for each station: replace null with averge of prior and subsetuqent non-null value for same station
+Beijing,27, windBearing,360,1457,0.035459,-100.000000, good data for whole timespan; just some scattered holes,for each station: replace null with averge of prior and subsetuqent non-null value for same station
+Beijing,29, windSpeed,1190,1457,0.035459,-5.000000, good data for whole timespan; just some scattered holes,for each station: replace null with averge of prior and subsetuqent non-null value for same station
+Beijing,10, apparentTemperature,3634,0,0.000000,,no holes; no problem,no holes; no problem
+Beijing,12, datetime,1174,0,0.000000,,no holes; no problem,no holes; no problem
+Beijing,13, dewPoint,3546,0,0.000000,,no holes; no problem,no holes; no problem
+Beijing,14, humidity,91,0,0.000000,,no holes; no problem,no holes; no problem
+Beijing,15, icon,8,0,0.000000,,no holes; no problem,no holes; no problem
+Beijing,6, id,41090,0,0.000000,,no holes; no problem,no holes; no problem
+Beijing,16, lat,37,0,0.000000,,no holes; no problem,no holes; no problem
+Beijing,17, long,47,0,0.000000,,no holes; no problem,no holes; no problem
+Beijing,7, station_id,35,0,0.000000,,no holes; no problem,no holes; no problem
+Beijing,23, summary,19,0,0.000000,,no holes; no problem,no holes; no problem
+Beijing,24, temperature,3301,0,0.000000,,no holes; no problem,no holes; no problem
+Beijing,8, test_id,1681,0,0.000000,,no holes; no problem,no holes; no problem
+Beijing,9, time,1174,0,0.000000,,no holes; no problem,no holes; no problem
+London,0, CO_Concentration,0,23022,1.000000,,no values whatsoever,drop for London
+London,2, O3_Concentration,0,23022,1.000000,,no values whatsoever,drop for London
+London,5, SO2_Concentration,0,23022,1.000000,,no values whatsoever,drop for London
+London,25, uvIndex,7,10203,0.443185,-1.000000,no good values until 4/22 9:00pm,for each station: replace null with averge of prior and subsetuqent non-null value for same station
+London,28, windGust,2849,10203,0.443185,-10.000000,no good values until 4/22 9:00pm,Station CD9 has an anoalous vlaue at 4/25 3pm. Replace with average of predecessor and successor
+London,18, ozone,5876,10127,0.439884,-100.000000,no good values until 4/22 9:00pm,Station CD9 has an anoalous vlaue at 4/25 3pm. Replace with average of predecessor and successor
+London,19, precipIntensity,536,10127,0.439884,-1.000000,no good values until 4/22 9:00pm,all values on 4/22 9pm and after ate fine.
+London,20, precipProbability,88,10127,0.439884,-1.000000,no good values until 4/22 9:00pm,all values on 4/22 9pm and after ate fine.
+London,21, precipType,1,8711,0.378377,n/a,n/a,replace null values with the word 'none' (no quotes)
+London,1, NO2_Concentration,1306,7318,0.317870,-100.000000,BX9 CT2 KF1 MYZ TD5 should be dropped. Maybe drop CT3,Station CD9 has an anoalous vlaue at 4/25 3pm. Replace with average of predecessor and successor
+London,3, PM10_Concentration,773,6054,0.262966,-100.000000,BX9 CT2 TD5 should be dropped, Replace with average of predecessor and successor
+London,4, PM25_Concentration,697,4406,0.191382,-100.000000,BX1 should be dropped,
+London,11, cloudCover,101,1657,0.071975,-1.000000,,If summary field says Foggy then set cloudCover  to 1.0; otherwise set to 0.0
+London,26, visibility,912,13,0.000565,-1.000000,Station CD9 is anomalous,Station CD9 has an anoalous vlaue at 4/25 3pm. Replace with average of predecessor and successor
+London,10, apparentTemperature,2625,0,0.000000,,no holes; no problem,no holes; no problem
+London,12, datetime,1220,0,0.000000,,no holes; no problem,no holes; no problem
+London,13, dewPoint,1392,0,0.000000,,no holes; no problem,no holes; no problem
+London,14, humidity,75,0,0.000000,,no holes; no problem,no holes; no problem
+London,15, icon,8,0,0.000000,,no holes; no problem,no holes; no problem
+London,6, id,23022,0,0.000000,,no holes; no problem,no holes; no problem
+London,16, lat,20,0,0.000000,,no holes; no problem,no holes; no problem
+London,17, long,19,0,0.000000,,no holes; no problem,no holes; no problem
+London,22, pressure,3381,0,0.000000,,no holes; no problem,no holes; no problem
+London,7, station_id,19,0,0.000000,,no holes; no problem,no holes; no problem
+London,23, summary,12,0,0.000000,,no holes; no problem,no holes; no problem
+London,24, temperature,2306,0,0.000000,,no holes; no problem,no holes; no problem
+London,8, test_id,625,0,0.000000,,no holes; no problem,no holes; no problem
+London,9, time,1220,0,0.000000,,no holes; no problem,no holes; no problem
+London,27, windBearing,360,0,0.000000,,no holes; no problem,no holes; no problem
+London,29, windSpeed,1897,0,0.000000,,no holes; no problem,no holes; no problem
