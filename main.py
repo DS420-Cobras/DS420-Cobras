@@ -15,7 +15,7 @@ import os.path
 
 # Use MeanMedianEnsamble, Smape, fastPred
 algosPresent = ['Smape', 'MeanMedianEnsamble', 'Means', 'Median', 'LassoStationFit', 'RandomForest', 'StationHourMedian']
-algoToUse = algosPresent[0] #max of 6
+algoToUse = algosPresent[3] #max of 6
 
 f = open('log.txt', 'a')
 
@@ -279,9 +279,13 @@ def doAnalysis2(cityBej = True):
     bejDf = newBejDf
     newBejDf = None
     assert(len(bejDf[bejDf['test_id'] != "None"]) == submissionCount) # We did not lose a single line for submission file
-    bejDf['precipType'] = bejDf.precipType.apply(lambda x: x if not pd.isnull(x) else 'None')
+
     #### LEO ###
-    # bejDf.to_csv(cityName + "Df.csv", index=False, sep=',')
+    bejDf.to_csv(cityName + "Df_revA.csv", index=False, sep=',')
+
+    bejDf['precipType'] = bejDf.precipType.apply(lambda x: x if not pd.isnull(x) else 'None')
+
+    bejDf.to_csv(cityName + "DfrevB.csv", index=False, sep=',')
     ### LEO ###
 
     bejDf.drop(labels='id', axis=1, inplace=True)
@@ -515,8 +519,13 @@ def doAnalysis3Beijing():
     newBejDf = None
     assert(len(bejDf[bejDf['test_id'] != "None"]) == submissionCount) # We did not lose a single line for submission file
 
+
     #### LEO ###
-    # bejDf.to_csv(cityName + "Df.csv", index=False, sep=',')
+    bejDf.to_csv(cityName + "Df_revA.csv", index=False, sep=',')
+
+    bejDf['precipType'] = bejDf.precipType.apply(lambda x: x if not pd.isnull(x) else 'None')
+
+    bejDf.to_csv(cityName + "DfrevB.csv", index=False, sep=',')
     ### LEO ###
 
     bejDf.drop(labels='id', axis=1, inplace=True)
@@ -737,7 +746,11 @@ def doAnalysis3London():
     assert(len(lonDf[lonDf['test_id'] != "None"]) == submissionCount) # We did not lose a single line for submission file
 
     #### LEO ###
-    # lonDf.to_csv(cityName + "Df.csv", index=False, sep=',')
+    lonDf.to_csv(cityName + "Df_revA.csv", index=False, sep=',')
+
+    lonDf['precipType'] = lonDf.precipType.apply(lambda x: x if not pd.isnull(x) else 'None')
+
+    lonDf.to_csv(cityName + "DfrevB.csv", index=False, sep=',')
     ### LEO ###
 
     lonDf.drop(labels='id', axis=1, inplace=True)
@@ -907,7 +920,7 @@ dt = datetime.datetime.utcnow()
 filename = algoName + "_" + str(dt.date().day) + "_" + str(dt.date().month) + "_" + str(dt.date().year) + "_" + str(dt.time().hour) + "_" + str(dt.time().minute) + "_" + str(dt.time().second) + ".csv"
 filename = os.path.join("Submissions", filename)
 
-combDf.to_csv(filename, index=False, sep=',', columns=['test_id', 'PM2.5', 'PM10', 'O3'])
-submit_preds.submit_preds(filename, 'leosalemann', algoName, filename=filename)
+# combDf.to_csv(filename, index=False, sep=',', columns=['test_id', 'PM2.5', 'PM10', 'O3'])
+# submit_preds.submit_preds(filename, 'leosalemann', algoName, filename=filename)
 
 f.close()
