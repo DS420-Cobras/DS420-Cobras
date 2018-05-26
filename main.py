@@ -21,8 +21,8 @@ from pytictoc import TicToc
 t = TicToc()
 
 # Use MeanMedianEnsamble, Smape, fastPred
-algosPresent = ['Smape', 'MeanMedianEnsamble', 'Means', 'Median', 'LassoStationFit', 'RandomForest', 'StationHourMedian']
-algoToUse = algosPresent[3] #max of 6
+algosPresent = ['Smape', 'MeanMedianEnsamble', 'Means', 'Median', 'LassoStationFit', 'RandomForest', 'StationHourMedian', 'Keras']
+algoToUse = algosPresent[7] #max of 6
 
 f = open('log.txt', 'a')
 
@@ -664,12 +664,24 @@ def doAnalysis3Beijing():
                 lm = MeanMedianEnsamble(features)
             elif algoToUse == 'StationHourMedian':
                 lm = StationHourMedian(features)
+            elif algoToUse == 'Keras':
+                lm = Sequential()
+                lm.add(Dense(len(features), input_dim=len(features), kernel_initializer='normal', activation='relu'))
+                lm.add(Dense(6, kernel_initializer='normal', activation='relu'))
+                lm.add(Dense(1, kernel_initializer='normal'))
+                lm.compile(loss="mean_absolute_percentage_error", optimizer='adam')
             algoName = algoToUse
-
+            
             X_train, X_test = df.iloc[train_index][features], df.iloc[test_index][features]
             Y_train, Y_test = df.iloc[train_index][[target]], df.iloc[test_index][[target]]
 
-            lm.fit(X_train, Y_train.values.ravel())
+            if algoToUse == 'Keras':
+                col = list(X_train.select_dtypes(include=[np.number]))
+                X_train[col] = MinMaxScaler().fit_transform(X_train[col])
+                X_test[col] = MinMaxScaler().fit_transform(X_test[col])
+                lm.fit(X_train,Y_train.values.ravel(), nb_epoch=30, batch_size=5)
+            else:
+                lm.fit(X_train, Y_train.values.ravel())
             Y_predicted = np.abs(lm.predict(X_test))
             #Y_predicted = lm.predict(X_test)
             #score = sklearn.metrics.r2_score(Y_test, Y_predicted)
@@ -891,12 +903,24 @@ def doAnalysis3London():
                 lm = MeanMedianEnsamble(features)
             elif algoToUse == 'StationHourMedian':
                 lm = StationHourMedian(features)
+            elif algoToUse == 'Keras':
+                lm = Sequential()
+                lm.add(Dense(len(features), input_dim=len(features), kernel_initializer='normal', activation='relu'))
+                lm.add(Dense(6, kernel_initializer='normal', activation='relu'))
+                lm.add(Dense(1, kernel_initializer='normal'))
+                lm.compile(loss="mean_squared_error", optimizer='adam')
             algoName = algoToUse
-
+            
             X_train, X_test = df.iloc[train_index][features], df.iloc[test_index][features]
             Y_train, Y_test = df.iloc[train_index][[target]], df.iloc[test_index][[target]]
 
-            lm.fit(X_train, Y_train.values.ravel())
+            if algoToUse == 'Keras':
+                col = list(X_train.select_dtypes(include=[np.number]))
+                X_train[col] = MinMaxScaler().fit_transform(X_train[col])
+                X_test[col] = MinMaxScaler().fit_transform(X_test[col])
+                lm.fit(X_train,Y_train.values.ravel(), nb_epoch=30, batch_size=5)
+            else:
+                lm.fit(X_train, Y_train.values.ravel())
             Y_predicted = np.abs(lm.predict(X_test))
             #Y_predicted = lm.predict(X_test)
             #score = sklearn.metrics.r2_score(Y_test, Y_predicted)
@@ -934,9 +958,10 @@ def doAnalysis3London():
     return submissionDf, algoName
 
 
-
+t.tic()
 bejSubDf, algoName = doAnalysis3Beijing()
 lonSubDf, algoName = doAnalysis3London()
+t.toc()
 
 combDf = pd.concat([bejSubDf, lonSubDf])
 dt = datetime.datetime.utcnow()
@@ -944,6 +969,6 @@ filename = algoName + "_" + str(dt.date().day) + "_" + str(dt.date().month) + "_
 filename = os.path.join("Submissions", filename)
 
 # combDf.to_csv(filename, index=False, sep=',', columns=['test_id', 'PM2.5', 'PM10', 'O3'])
-# submit_preds.submit_preds(filename, 'leosalemann', algoName, filename=filename)
+# submit_preds.submit_preds(filename, 'ghand1', algoName, filename=filename)
 
 f.close()
