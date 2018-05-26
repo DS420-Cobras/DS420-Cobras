@@ -113,11 +113,11 @@
 ,,,"May 22, 2018, 7:45 a.m."
 0.429739876,Submission success,MeanMedianEnsamble,Submissions\MeanMedianEnsamble_22_5_2018_7_52_2.csv
 ,,,"May 22, 2018, 7:52 a.m."
-To be released,Submission success,fastPred,mean.csv
+0.389301686,Submission success,fastPred,mean.csv
 ,,,"May 23, 2018, 7:06 a.m."
-To be released,Submission success,Smape,Submissions\Smape_23_5_2018_7_27_28.csv
+0.508499334,Submission success,Smape,Submissions\Smape_23_5_2018_7_27_28.csv
 ,,,"May 23, 2018, 7:27 a.m."
-To be released,Submission success,MeanMedianEnsamble,Submissions\MeanMedianEnsamble_23_5_2018_7_32_12.csv
+0.459739749,Submission success,MeanMedianEnsamble,Submissions\MeanMedianEnsamble_23_5_2018_7_32_12.csv
 ,,,"May 23, 2018, 7:32 a.m."
 To be released,Submission success,"Bej=Keras, Lon=MeanMedianEnsemble",Submissions/MeanMedianEnsamble_24_5_2018_5_42_24.csv
 ,,,"May 24, 2018, 5:42 a.m."
@@ -131,3 +131,9 @@ To be released,Submission success,fastPred,mean.csv
 ,,,"May 25, 2018, 6:06 a.m."
 To be released,Submission success,Smape,Submissions\Smape_25_5_2018_6_38_7.csv
 ,,,"May 25, 2018, 6:38 a.m."
+To be released,Submission success,fastPred,mean.csv
+,,,"May 26, 2018, 7:38 a.m."
+To be released,Submission success,Smape,Submissions\Smape_26_5_2018_7_55_28.csv
+,,,"May 26, 2018, 7:55 a.m."
+To be released,Submission success,MeanMedianEnsamble,Submissions\MeanMedianEnsamble_26_5_2018_8_9_14.csv
+,,,"May 26, 2018, 8:09 a.m."
