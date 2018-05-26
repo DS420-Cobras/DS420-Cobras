@@ -279,7 +279,7 @@ def doAnalysis2(cityBej = True):
     bejDf = newBejDf
     newBejDf = None
     assert(len(bejDf[bejDf['test_id'] != "None"]) == submissionCount) # We did not lose a single line for submission file
-
+    bejDf['precipType'] = bejDf.precipType.apply(lambda x: x if not pd.isnull(x) else 'None')
     #### LEO ###
     # bejDf.to_csv(cityName + "Df.csv", index=False, sep=',')
     ### LEO ###
