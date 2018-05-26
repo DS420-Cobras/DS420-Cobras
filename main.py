@@ -14,8 +14,9 @@ import submit_preds
 import os.path
 
 # Use MeanMedianEnsamble, Smape, fastPred
+#                  0        1                     2       3          4                  5                 6
 algosPresent = ['Smape', 'MeanMedianEnsamble', 'Means', 'Median', 'LassoStationFit', 'RandomForest', 'StationHourMedian']
-algoToUse = algosPresent[3] #max of 6
+algoToUse = algosPresent[4]
 
 f = open('log.txt', 'a')
 
@@ -541,7 +542,7 @@ def doAnalysis3Beijing():
     bejDf.drop(labels='uvIndex', axis=1, inplace=True)    # need to change some nulls to zero after 4/23/18 10am
     # bejDf.drop(labels='windGust', axis=1, inplace=True) # clean /non-null data starts on 4/23/18 10am
     bejDf.drop(labels='cloudCover', axis=1, inplace=True)
-    bejDf.drop(labels='precipType', axis=1, inplace=True)
+    # bejDf.drop(labels='precipType', axis=1, inplace=True)
     bejDf.drop(labels='visibility', axis=1, inplace=True) # way too many nulls
 
     # Make categorical columns for for time based attributes
@@ -766,7 +767,7 @@ def doAnalysis3London():
     lonDf.drop(labels='uvIndex', axis=1, inplace=True)  # has only one nan after 4/22/18 9pm, need to set to zero
     lonDf.drop(labels='windGust', axis=1, inplace=True) # has only one nan after 4/22/18 9pm, need to set to zero
     lonDf.drop(labels='cloudCover', axis=1, inplace=True)
-    lonDf.drop(labels='precipType', axis=1, inplace=True)
+    # lonDf.drop(labels='precipType', axis=1, inplace=True)
     lonDf.drop(labels='visibility', axis=1, inplace=True)
 
     # Make categorical columns for for time based attributes
