@@ -125,11 +125,11 @@
 ,,,"May 24, 2018, 6:57 a.m."
 0.621187582,Submission success,Smape,Submissions\Smape_24_5_2018_7_25_46.csv
 ,,,"May 24, 2018, 7:25 a.m."
-To be released,Submission success,Keras,Submissions/Keras_25_5_2018_1_49_1.csv
+1.394490686,Submission success,Keras,Submissions/Keras_25_5_2018_1_49_1.csv
 ,,,"May 25, 2018, 1:49 a.m."
-To be released,Submission success,fastPred,mean.csv
+0.53744807,Submission success,fastPred,mean.csv
 ,,,"May 25, 2018, 6:06 a.m."
-To be released,Submission success,Smape,Submissions\Smape_25_5_2018_6_38_7.csv
+0.647704673,Submission success,Smape,Submissions\Smape_25_5_2018_6_38_7.csv
 ,,,"May 25, 2018, 6:38 a.m."
 To be released,Submission success,fastPred,mean.csv
 ,,,"May 26, 2018, 7:38 a.m."
@@ -143,3 +143,7 @@ To be released,Submission success,fastPred,mean.csv
 ,,,"May 27, 2018, 7:54 a.m."
 To be released,Submission success,Smape,Submissions\Smape_27_5_2018_8_35_34.csv
 ,,,"May 27, 2018, 8:35 a.m."
+To be released,Submission success,fastPred,mean.csv
+,,,"May 28, 2018, 6:36 a.m."
+To be released,Submission success,Smape,Submissions\Smape_28_5_2018_6_56_44.csv
+,,,"May 28, 2018, 6:56 a.m."
