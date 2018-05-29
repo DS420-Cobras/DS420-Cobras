@@ -2,8 +2,6 @@ import load_data
 import pandas as pd
 import sklearn.linear_model
 import sklearn.ensemble
-import matplotlib.pyplot as plt
-import plot
 import time
 import datetime
 import numpy as np
@@ -14,8 +12,9 @@ import submit_preds
 import os.path
 from sklearn.preprocessing import MinMaxScaler
 from keras.models import Sequential
-from keras.layers import Dense
+from keras.layers import Dense, Dropout, Conv2D
 from keras import backend as K
+from keras import optimizers
 
 from pytictoc import TicToc
 t = TicToc()
@@ -235,7 +234,7 @@ def doAnalysis2(cityBej = True):
     now = datetime.datetime.utcnow()
     endDate = datetime.datetime.strptime(str(now.date().year) + '-' + str(now.date().month) + '-' + str(now.date().day), '%Y-%m-%d') + datetime.timedelta(hours=96)
     firstPredTime = datetime.datetime.strptime(str(now.date().year) + '-' + str(now.date().month) + '-' + str(now.date().day+1), '%Y-%m-%d')
-    lastPredTime = datetime.datetime.strptime(str(now.date().year) + '-' + str(now.date().month) + '-' + str(now.date().day+3), '%Y-%m-%d')
+    lastPredTime = firstPredTime + datetime.timedelta(days=2)
 
     # Dataframe useful for final predictions
     submissionTimes = []
@@ -415,28 +414,12 @@ def doAnalysis2(cityBej = True):
                 lm = MeanMedianEnsamble(features)
             elif algoToUse == 'StationHourMedian':
                 lm = StationHourMedian(features)
-            elif algoToUse == 'Keras':
-                lm = Sequential()
-                lm.add(Dense(len(features), input_dim=len(features), kernel_initializer='normal', activation='relu'))
-                lm.add(Dense(6, kernel_initializer='normal', activation='relu'))
-                lm.add(Dense(1, kernel_initializer='normal'))
-                if cityBej:
-                    loss = "mean_absolute_percentage_error"
-                else:
-                    loss = "mean_squared_error"
-                lm.compile(loss=loss, optimizer='adam')
             algoName = algoToUse
-            
+
             X_train, X_test = df.iloc[train_index][features], df.iloc[test_index][features]
             Y_train, Y_test = df.iloc[train_index][[target]], df.iloc[test_index][[target]]
 
-            if algoToUse == 'Keras':
-                col = list(X_train.select_dtypes(include=[np.number]))
-                X_train[col] = MinMaxScaler().fit_transform(X_train[col])
-                X_test[col] = MinMaxScaler().fit_transform(X_test[col])
-                lm.fit(X_train,Y_train.values.ravel(), nb_epoch=30, batch_size=5)
-            else:
-                lm.fit(X_train, Y_train.values.ravel())
+            lm.fit(X_train, Y_train.values.ravel())
             Y_predicted = np.abs(lm.predict(X_test))
             #Y_predicted = lm.predict(X_test)
             #score = sklearn.metrics.r2_score(Y_test, Y_predicted)
@@ -490,7 +473,7 @@ def doAnalysis3Beijing():
     now = datetime.datetime.utcnow()
     endDate = datetime.datetime.strptime(str(now.date().year) + '-' + str(now.date().month) + '-' + str(now.date().day), '%Y-%m-%d') + datetime.timedelta(hours=96)
     firstPredTime = datetime.datetime.strptime(str(now.date().year) + '-' + str(now.date().month) + '-' + str(now.date().day+1), '%Y-%m-%d')
-    lastPredTime = datetime.datetime.strptime(str(now.date().year) + '-' + str(now.date().month) + '-' + str(now.date().day+3), '%Y-%m-%d')
+    lastPredTime = firstPredTime + datetime.timedelta(days=2)
 
     # Dataframe useful for final predictions
     submissionTimes = []
@@ -647,7 +630,7 @@ def doAnalysis3Beijing():
         #if target == 'O3_Concentration':
         #    shuf = True
         shuf = True
-        kf = sklearn.model_selection.KFold(n_splits=5, shuffle=shuf, random_state=42)
+        kf = sklearn.model_selection.KFold(n_splits=2, shuffle=shuf, random_state=42)
         modelScores = []
         for train_index, test_index in kf.split(df):
             if algoToUse == 'Means':
@@ -665,11 +648,14 @@ def doAnalysis3Beijing():
             elif algoToUse == 'StationHourMedian':
                 lm = StationHourMedian(features)
             elif algoToUse == 'Keras':
+                Adagrad = optimizers.Adagrad(lr=0.001)
                 lm = Sequential()
-                lm.add(Dense(len(features), input_dim=len(features), kernel_initializer='normal', activation='relu'))
-                lm.add(Dense(6, kernel_initializer='normal', activation='relu'))
-                lm.add(Dense(1, kernel_initializer='normal'))
-                lm.compile(loss="mean_absolute_percentage_error", optimizer='adam')
+                lm.add(Dense(len(features), input_dim=len(features)))
+                lm.add(Dense(6, activation='relu'))
+                lm.add(Dense(18, activation='relu'))
+                lm.add(Dropout(0.2))
+                lm.add(Dense(1, activation='linear'))
+                lm.compile(loss="mean_absolute_percentage_error", optimizer=Adagrad)
             algoName = algoToUse
             
             X_train, X_test = df.iloc[train_index][features], df.iloc[test_index][features]
@@ -679,7 +665,7 @@ def doAnalysis3Beijing():
                 col = list(X_train.select_dtypes(include=[np.number]))
                 X_train[col] = MinMaxScaler().fit_transform(X_train[col])
                 X_test[col] = MinMaxScaler().fit_transform(X_test[col])
-                lm.fit(X_train,Y_train.values.ravel(), nb_epoch=30, batch_size=5)
+                lm.fit(X_train,Y_train, validation_split=0.33, nb_epoch=300, batch_size=5, verbose=1)
             else:
                 lm.fit(X_train, Y_train.values.ravel())
             Y_predicted = np.abs(lm.predict(X_test))
@@ -732,7 +718,7 @@ def doAnalysis3London():
     now = datetime.datetime.utcnow()
     endDate = datetime.datetime.strptime(str(now.date().year) + '-' + str(now.date().month) + '-' + str(now.date().day), '%Y-%m-%d') + datetime.timedelta(hours=96)
     firstPredTime = datetime.datetime.strptime(str(now.date().year) + '-' + str(now.date().month) + '-' + str(now.date().day+1), '%Y-%m-%d')
-    lastPredTime = datetime.datetime.strptime(str(now.date().year) + '-' + str(now.date().month) + '-' + str(now.date().day+3), '%Y-%m-%d')
+    lastPredTime = firstPredTime + datetime.timedelta(days=2)
 
     # Dataframe useful for final predictions
     submissionTimes = []
@@ -886,7 +872,7 @@ def doAnalysis3London():
         #if target == 'O3_Concentration':
         #    shuf = True
         shuf = True
-        kf = sklearn.model_selection.KFold(n_splits=5, shuffle=shuf, random_state=42)
+        kf = sklearn.model_selection.KFold(n_splits=2, shuffle=shuf, random_state=42)
         modelScores = []
         for train_index, test_index in kf.split(df):
             if algoToUse == 'Means':
@@ -904,21 +890,24 @@ def doAnalysis3London():
             elif algoToUse == 'StationHourMedian':
                 lm = StationHourMedian(features)
             elif algoToUse == 'Keras':
+                Adagrad = optimizers.Adagrad(lr=0.0001)
                 lm = Sequential()
-                lm.add(Dense(len(features), input_dim=len(features), kernel_initializer='normal', activation='relu'))
-                lm.add(Dense(6, kernel_initializer='normal', activation='relu'))
-                lm.add(Dense(1, kernel_initializer='normal'))
-                lm.compile(loss="mean_squared_error", optimizer='adam')
+                lm.add(Dense(len(features), input_dim=len(features)))
+                lm.add(Dense(6, activation='relu'))
+                lm.add(Dense(18, activation='relu'))
+                lm.add(Dropout(0.2))
+                lm.add(Dense(1, activation='linear'))
+                lm.compile(loss="mean_squared_error", optimizer=Adagrad)
             algoName = algoToUse
             
             X_train, X_test = df.iloc[train_index][features], df.iloc[test_index][features]
             Y_train, Y_test = df.iloc[train_index][[target]], df.iloc[test_index][[target]]
 
             if algoToUse == 'Keras':
-                col = list(X_train.select_dtypes(include=[np.number]))
-                X_train[col] = MinMaxScaler().fit_transform(X_train[col])
-                X_test[col] = MinMaxScaler().fit_transform(X_test[col])
-                lm.fit(X_train,Y_train.values.ravel(), nb_epoch=30, batch_size=5)
+                #col = list(X_train.select_dtypes(include=[np.number]))
+                #X_train[col] = MinMaxScaler().fit_transform(X_train[col])
+                #X_test[col] = MinMaxScaler().fit_transform(X_test[col])
+                lm.fit(X_train,Y_train, validation_split=0.2, nb_epoch=300, batch_size=5)
             else:
                 lm.fit(X_train, Y_train.values.ravel())
             Y_predicted = np.abs(lm.predict(X_test))
@@ -958,17 +947,15 @@ def doAnalysis3London():
     return submissionDf, algoName
 
 
-t.tic()
 bejSubDf, algoName = doAnalysis3Beijing()
 lonSubDf, algoName = doAnalysis3London()
-t.toc()
 
 combDf = pd.concat([bejSubDf, lonSubDf])
 dt = datetime.datetime.utcnow()
 filename = algoName + "_" + str(dt.date().day) + "_" + str(dt.date().month) + "_" + str(dt.date().year) + "_" + str(dt.time().hour) + "_" + str(dt.time().minute) + "_" + str(dt.time().second) + ".csv"
 filename = os.path.join("Submissions", filename)
 
-# combDf.to_csv(filename, index=False, sep=',', columns=['test_id', 'PM2.5', 'PM10', 'O3'])
-# submit_preds.submit_preds(filename, 'ghand1', algoName, filename=filename)
+#combDf.to_csv(filename, index=False, sep=',', columns=['test_id', 'PM2.5', 'PM10', 'O3'])
+#submit_preds.submit_preds(filename, 'ghand1', algoName, filename=filename)
 
 f.close()
