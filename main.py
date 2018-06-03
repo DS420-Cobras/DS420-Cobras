@@ -15,7 +15,7 @@ import os.path
 
 # Use MeanMedianEnsamble, Smape, fastPred
 algosPresent = ['Smape', 'MeanMedianEnsamble', 'Means', 'Median', 'LassoStationFit', 'RandomForest', 'StationHourMedian']
-algoToUse = algosPresent[6] #max of 6
+algoToUse = algosPresent[0] #max of 6
 
 f = open('log.txt', 'a')
 
@@ -224,9 +224,13 @@ def doAnalysis2(cityBej = True):
 
     startDate = np.min(bejDf['time'])
     now = datetime.datetime.utcnow()
+    end = now + datetime.timedelta(hours=96)
+    firstPred = now + datetime.timedelta(days=1)
+    lastpPred = now + datetime.timedelta(days=3)
+
     endDate = datetime.datetime.strptime(str(now.date().year) + '-' + str(now.date().month) + '-' + str(now.date().day), '%Y-%m-%d') + datetime.timedelta(hours=96)
-    firstPredTime = datetime.datetime.strptime(str(now.date().year) + '-' + str(now.date().month) + '-' + str(now.date().day+1), '%Y-%m-%d')
-    lastPredTime = datetime.datetime.strptime(str(now.date().year) + '-' + str(now.date().month) + '-' + str(now.date().day+3), '%Y-%m-%d')
+    firstPredTime = datetime.datetime.strptime(str(firstPred.date().year) + '-' + str(firstPred.date().month) + '-' + str(firstPred.date().day), '%Y-%m-%d')
+    lastPredTime  = datetime.datetime.strptime(str(lastpPred.date().year) + '-' + str(lastpPred.date().month) + '-' + str(lastpPred.date().day), '%Y-%m-%d')
 
     # Dataframe useful for final predictions
     submissionTimes = []
