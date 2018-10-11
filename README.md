@@ -4,9 +4,13 @@ Python code for our [KDD Cup 2018](https://biendata.com/competition/kdd_2018/) (
 
 ## We are:
 - Leo  - GitHubber, Agilist, Pythonista, Viz-Kid
-- Yash
-- Venkata - Data Engineer
-- David
+- Yash - Pipeliner, Pythonologist, Master of Metrics
+- Venkata - Data Engineer, Givn' all she's got, Cap'n!
+- David - Data Scientist & Explorationist.
+
+# We wrote:
+
+[Final Report](./doc/DS420-Cobras%20Final%20Report.pdf)
 
 ![cobra icon](icons/snake.svg)
 
